@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { animals as animalsApi } from '@/api'
+import { useI18n } from '@/i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const treeData = ref(null)
@@ -29,11 +31,11 @@ function hasParents(node) {
 <template>
   <div>
     <div class="flex items-center gap-3 mb-6">
-      <button class="btn-secondary btn-sm" @click="router.back()">← Zurück</button>
-      <h1 class="text-2xl font-bold text-slate-200">Stammbaum</h1>
+      <button class="btn-secondary btn-sm" @click="router.back()">{{ t('common.back') }}</button>
+      <h1 class="text-2xl font-bold text-slate-200">{{ t('tree.title') }}</h1>
     </div>
 
-    <div v-if="loading" class="text-slate-500 text-center py-16">Lade…</div>
+    <div v-if="loading" class="text-slate-500 text-center py-16">{{ t('common.loading') }}</div>
 
     <div v-else-if="treeData" class="overflow-x-auto pb-6">
 
@@ -41,7 +43,7 @@ function hasParents(node) {
       <div class="flex gap-4 mb-6 text-xs text-slate-500">
         <span class="flex items-center gap-1"><span class="font-mono text-xs text-slate-400">0.1.0</span></span>
         <span class="flex items-center gap-1"><span class="font-mono text-xs text-slate-400">1.0.0</span></span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-brand-500 inline-block"></span> Ausgewähltes Tier</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-brand-500 inline-block"></span> {{ t('tree.selected') }}</span>
       </div>
 
       <!-- Tree structure -->
@@ -136,7 +138,7 @@ function hasParents(node) {
         <!-- Offspring -->
         <template v-if="treeData.offspring.length">
           <div class="w-px h-6 bg-surface-500"></div>
-          <div class="text-xs text-slate-500 mb-2">Nachzucht ({{ treeData.offspring.length }})</div>
+          <div class="text-xs text-slate-500 mb-2">{{ t('tree.offspring') }} ({{ treeData.offspring.length }})</div>
           <div class="flex flex-wrap gap-3 justify-center max-w-2xl">
             <div
               v-for="child in treeData.offspring" :key="child.id"

@@ -86,13 +86,13 @@ function fmtDateTime(d) {
         <div>
           <label>{{ t('feeding.animal') }} *</label>
           <select v-model="form.animal_id" required>
-            <option value="">{{ t('feeding.animal') }}…</option>
+            <option value="">{{ t('feeding.select_animal') }}</option>
             <option v-for="a in allAnimals.filter(a => a.is_active)" :key="a.id" :value="a.id">{{ a.name }}</option>
           </select>
         </div>
         <div><label>{{ t('feeding.date') }}</label><input type="datetime-local" v-model="form.date" required /></div>
-        <div><label>{{ t('feeding.food_type') }} *</label><input v-model="form.food_type" placeholder="Maus, Ratte…" required /></div>
-        <div><label>{{ t('feeding.food_size') }}</label><input v-model="form.food_size" placeholder="Pinky, Adult…" /></div>
+        <div><label>{{ t('feeding.food_type') }} *</label><input v-model="form.food_type" :placeholder="t('feeding.food_type_placeholder')" required /></div>
+        <div><label>{{ t('feeding.food_size') }}</label><input v-model="form.food_size" :placeholder="t('feeding.food_size_placeholder')" /></div>
         <div><label>{{ t('feeding.count') }}</label><input type="number" v-model="form.food_count" min="1" /></div>
         <div><label>{{ t('feeding.weight') }}</label><input type="number" v-model="form.food_weight_g" step="0.1" /></div>
         <div class="flex gap-4 items-end pb-2">
@@ -124,7 +124,7 @@ function fmtDateTime(d) {
             <th class="pb-2 pr-4">{{ t('feeding.date') }}</th>
             <th class="pb-2 pr-4">{{ t('feeding.food_type') }}</th>
             <th class="pb-2 pr-4">{{ t('feeding.weight') }}</th>
-            <th class="pb-2 pr-4">Status</th>
+            <th class="pb-2 pr-4">{{ t('animal.status') }}</th>
             <th class="pb-2 pr-4">{{ t('feeding.notes') }}</th>
             <th class="pb-2"></th>
           </tr>

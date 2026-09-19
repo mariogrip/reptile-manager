@@ -53,7 +53,7 @@ onMounted(async () => {
       })
       if (data.date_of_birth) form.value.date_of_birth = data.date_of_birth.substring(0, 10)
       if (data.date_acquired) form.value.date_acquired  = data.date_acquired.substring(0, 10)
-    } catch { error.value = 'Tier konnte nicht geladen werden.' }
+    } catch { error.value = t('animal.loadError') }
     finally { loading.value = false }
   }
 })
@@ -108,7 +108,7 @@ async function save() {
     router.push(`/animals/${savedId}`)
   } catch (e) {
     const d = e.response?.data?.detail
-    error.value = Array.isArray(d) ? d.map(x => x.msg).join(', ') : (d || e.message || 'Unbekannter Fehler')
+    error.value = Array.isArray(d) ? d.map(x => x.msg).join(', ') : (d || e.message || t('common.unknownError'))
   } finally {
     saving.value = false
   }
@@ -134,7 +134,7 @@ async function save() {
       <div class="grid sm:grid-cols-2 gap-4">
         <div>
           <label>{{ t('animal.name') }} *</label>
-          <input v-model="form.name" required placeholder="z.B. Noodle" />
+          <input v-model="form.name" required :placeholder="t('animal.name_placeholder')" />
         </div>
         <div>
           <label>{{ t('animal.sex') }}</label>
@@ -150,11 +150,11 @@ async function save() {
         </div>
         <div>
           <label>{{ t('animal.common_name') }}</label>
-          <input v-model="form.common_name" placeholder="Königspython" />
+          <input v-model="form.common_name" :placeholder="t('animal.common_name_placeholder')" />
         </div>
         <div class="sm:col-span-2">
           <label>{{ t('animal.morph') }}</label>
-          <input v-model="form.morph" placeholder="z.B. Pastel Clown…" />
+          <input v-model="form.morph" :placeholder="t('animal.morph_placeholder')" />
         </div>
       </div>
 
@@ -162,8 +162,8 @@ async function save() {
       <div class="grid sm:grid-cols-2 gap-4">
         <div>
           <label>{{ t('animal.tracking_id') }}</label>
-          <input v-model="form.tracking_id" placeholder="Automatisch vergeben wenn leer" />
-          <p class="text-xs text-slate-600 mt-1">Leer lassen = nächste freie Nummer</p>
+          <input v-model="form.tracking_id" :placeholder="t('animal.tracking_id_placeholder')" />
+          <p class="text-xs text-slate-600 mt-1">{{ t('animal.tracking_id_hint') }}</p>
         </div>
         <div>
           <label>{{ t('animal.status') }}</label>
@@ -217,7 +217,7 @@ async function save() {
           <div>
             <label>{{ t('animal.mother') }}</label>
             <select v-model="form.mother_id">
-              <option :value="null">— keine —</option>
+              <option :value="null">{{ t('animal.noParent') }}</option>
               <option v-for="a in parentOptions.filter(a => a.sex !== 'male')" :key="a.id" :value="a.id">
                 {{ a.name }} ({{ a.species }})
               </option>
@@ -226,7 +226,7 @@ async function save() {
           <div>
             <label>{{ t('animal.father') }}</label>
             <select v-model="form.father_id">
-              <option :value="null">— keine —</option>
+              <option :value="null">{{ t('animal.noParent') }}</option>
               <option v-for="a in parentOptions.filter(a => a.sex !== 'female')" :key="a.id" :value="a.id">
                 {{ a.name }} ({{ a.species }})
               </option>
@@ -265,7 +265,7 @@ async function save() {
           <div><label>{{ t('animal.humidity_min') }}</label><input type="number" v-model="form.humidity_min" min="0" max="100" placeholder="60" /></div>
           <div><label>{{ t('animal.humidity_max') }}</label><input type="number" v-model="form.humidity_max" min="0" max="100" placeholder="80" /></div>
           <div><label>{{ t('animal.terrarium') }}</label><input v-model="form.terrarium_size" placeholder="120×60×60 cm" /></div>
-          <div><label>{{ t('animal.substrate') }}</label><input v-model="form.substrate" placeholder="Kokoserde…" /></div>
+          <div><label>{{ t('animal.substrate') }}</label><input v-model="form.substrate" :placeholder="t('animal.substrate_placeholder')" /></div>
           <div><label>{{ t('animal.lighting') }}</label><input type="number" v-model="form.lighting_hours" min="0" max="24" placeholder="12" /></div>
           <div class="flex items-end pb-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -295,21 +295,21 @@ async function save() {
             <!-- Existing uploaded photo -->
             <div v-if="isUploadedPhoto && !photoPreview"
                  class="flex items-center gap-2 text-sm text-slate-400">
-              <span>📷 Hochgeladenes Foto</span>
+              <span>{{ t('animal.uploaded_photo') }}</span>
               <button type="button" @click="removePhoto"
-                      class="text-xs text-red-400 hover:text-red-300">🗑 Entfernen</button>
+                      class="text-xs text-red-400 hover:text-red-300">🗑 {{ t('common.delete') }}</button>
             </div>
             <!-- File upload -->
             <div>
-              <label class="text-xs text-slate-500 mb-1">Neues Foto hochladen</label>
+              <label class="text-xs text-slate-500 mb-1">{{ t('animal.upload_new') }}</label>
               <input type="file" accept="image/*" @change="onPhotoSelect"
                      class="file:btn-secondary file:btn-sm file:mr-2 file:cursor-pointer text-sm" />
               <button v-if="photoPreview" type="button" @click="removePhoto"
-                      class="text-xs text-red-400 hover:text-red-300 mt-1 block">✕ Auswahl verwerfen</button>
+                      class="text-xs text-red-400 hover:text-red-300 mt-1 block">✕ {{ t('common.discard') }}</button>
             </div>
             <!-- External URL (only if no uploaded photo) -->
             <div v-if="!isUploadedPhoto">
-              <label class="text-xs text-slate-500">Oder externe URL:</label>
+              <label class="text-xs text-slate-500">{{ t('animal.external_url') }}</label>
               <input v-model="form.photo_url" type="url" placeholder="https://…" class="text-sm mt-1" />
             </div>
           </div>
@@ -319,7 +319,7 @@ async function save() {
       <!-- Notes -->
       <div>
         <label>{{ t('animal.notes') }}</label>
-        <textarea v-model="form.notes" rows="3" placeholder="Besonderheiten, Herkunft…"></textarea>
+        <textarea v-model="form.notes" rows="3" :placeholder="t('animal.notes_placeholder')"></textarea>
       </div>
 
       <!-- Actions -->

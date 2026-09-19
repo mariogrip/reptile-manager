@@ -122,9 +122,9 @@ async function createBulk() {
       status: 'active',
     })
     showBulkModal.value = false
-    alert(`${bulkQty.value} Tier(e) erfolgreich angelegt!`)
+    alert(`${bulkQty.value} ${t('breeding.bulkSuccess')}`)
   } catch (e) {
-    alert('Fehler: ' + (e.response?.data?.detail || e.message))
+    alert(t('common.error') + ': ' + (e.response?.data?.detail || e.message))
   } finally {
     savingBulk.value = false
   }
@@ -149,14 +149,14 @@ const females = () => allAnimals.value.filter(a => a.sex !== 'male')
         <div>
           <label>{{ t('breeding.female') }} *</label>
           <select v-model="form.female_id" required>
-            <option value="">Wählen…</option>
+            <option value="">{{ t('common.choose') }}</option>
             <option v-for="a in females()" :key="a.id" :value="a.id">{{ a.name }} – {{ a.morph ?? a.species }}</option>
           </select>
         </div>
         <div>
           <label>{{ t('breeding.male') }} *</label>
           <select v-model="form.male_id" required>
-            <option value="">Wählen…</option>
+            <option value="">{{ t('common.choose') }}</option>
             <option v-for="a in males()" :key="a.id" :value="a.id">{{ a.name }} – {{ a.morph ?? a.species }}</option>
           </select>
         </div>
@@ -261,7 +261,7 @@ const females = () => allAnimals.value.filter(a => a.sex !== 'male')
             <div>
               <label>{{ t('breeding.quantity') }}</label>
               <input type="number" v-model.number="bulkQty" min="1" max="500" />
-              <p class="text-xs text-slate-500 mt-1">Jedes Tier bekommt automatisch eine fortlaufende ID</p>
+              <p class="text-xs text-slate-500 mt-1">{{ t('breeding.bulkHint') }}</p>
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div><label>{{ t('animal.dob') }}</label><input type="date" v-model="bulkDob" /></div>
@@ -276,11 +276,11 @@ const females = () => allAnimals.value.filter(a => a.sex !== 'male')
             </div>
             <div>
               <label>{{ t('breeding.notes') }}</label>
-              <textarea v-model="bulkNotes" rows="2" placeholder="z.B. Saison 2025, Farbform…" />
+              <textarea v-model="bulkNotes" rows="2" :placeholder="t('breeding.notes_placeholder')" />
             </div>
             <div class="flex gap-3">
               <button class="btn-primary flex-1" :disabled="savingBulk" @click="createBulk">
-                {{ savingBulk ? t('common.saving') : `${bulkQty} Tier(e) anlegen` }}
+                {{ savingBulk ? t('common.saving') : `${bulkQty} ${t('breeding.bulkCreate')}` }}
               </button>
               <button class="btn-secondary" @click="showBulkModal = false">{{ t('common.cancel') }}</button>
             </div>

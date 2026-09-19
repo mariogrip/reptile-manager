@@ -52,7 +52,7 @@ function age(dob) {
   if (!dob) return null
   const d = new Date(dob), now = new Date()
   const months = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth()
-  return months < 24 ? `${months} Monate` : `${(months/12).toFixed(1)} Jahre`
+  return months < 24 ? `${months} ${t('common.months')}` : `${(months/12).toFixed(1)} ${t('common.years')}`
 }
 
 async function addFeeding() {
@@ -126,12 +126,12 @@ function sexNotation(sex) {
   <div v-else-if="animal">
     <!-- Header -->
     <div class="flex flex-wrap items-start gap-4 mb-6">
-      <button class="btn-secondary btn-sm" @click="router.push('/animals')">← Tiere</button>
+      <button class="btn-secondary btn-sm" @click="router.push('/animals')">{{ t('common.back') }}</button>
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-3 flex-wrap">
           <h1 class="text-2xl font-bold text-slate-200">{{ animal.name }}</h1>
           <span class="badge-gray">{{ sexNotation(animal.sex) }}</span>
-          <span v-if="!animal.is_active" class="badge-red">Inaktiv</span>
+          <span v-if="!animal.is_active" class="badge-red">{{ t('status.inactive') }}</span>
         </div>
         <p class="text-slate-400 italic">{{ animal.species }}<span v-if="animal.common_name"> · {{ animal.common_name }}</span></p>
         <p v-if="animal.morph" class="text-brand-400 text-sm">{{ animal.morph }}</p>
@@ -229,12 +229,12 @@ function sexNotation(sex) {
 
     <!-- Tabs -->
     <div class="flex gap-1 mb-4 border-b border-surface-600">
-      <button v-for="t in [{id:'feedings',label:t('feeding.title'),count:feedingList.length},{id:'sheddings',label:t('shedding.title'),count:sheddingList.length},{id:'custom',label:t('animal.custom_fields'),count:customFieldList.length}]"
-        :key="t.id"
-        @click="tab = t.id"
-        :class="tab === t.id ? 'text-brand-400 border-b-2 border-brand-400' : 'text-slate-500 hover:text-slate-300'"
+      <button v-for="tabItem in [{id:'feedings',label:t('feeding.title'),count:feedingList.length},{id:'sheddings',label:t('shedding.title'),count:sheddingList.length},{id:'custom',label:t('animal.custom_fields'),count:customFieldList.length}]"
+        :key="tabItem.id"
+        @click="tab = tabItem.id"
+        :class="tab === tabItem.id ? 'text-brand-400 border-b-2 border-brand-400' : 'text-slate-500 hover:text-slate-300'"
         class="px-4 py-2 text-sm font-medium transition-colors -mb-px">
-        {{ t.label }} <span class="ml-1 text-xs opacity-60">({{ t.count }})</span>
+        {{ tabItem.label }} <span class="ml-1 text-xs opacity-60">({{ tabItem.count }})</span>
       </button>
     </div>
 
@@ -249,17 +249,17 @@ function sexNotation(sex) {
       <div v-if="showFeedingForm" class="card mb-4">
         <h3 class="font-medium text-slate-200 mb-3">{{ t('feeding.add') }}</h3>
         <form @submit.prevent="addFeeding" class="grid sm:grid-cols-2 gap-3">
-          <div><label>Datum & Zeit</label><input type="datetime-local" v-model="feedingForm.date" required /></div>
-          <div><label>Futtertier</label><input v-model="feedingForm.food_type" placeholder="Maus, Ratte, Grillen…" required /></div>
-          <div><label>{{ t('feeding.food_size') }}</label><input v-model="feedingForm.food_size" placeholder="Pinky, Adult, L…" /></div>
-          <div><label>Anzahl</label><input type="number" v-model="feedingForm.food_count" min="1" /></div>
+          <div><label>{{ t('feeding.date') }}</label><input type="datetime-local" v-model="feedingForm.date" required /></div>
+          <div><label>{{ t('feeding.food_type') }}</label><input v-model="feedingForm.food_type" :placeholder="t('feeding.food_type_placeholder')" required /></div>
+          <div><label>{{ t('feeding.food_size') }}</label><input v-model="feedingForm.food_size" :placeholder="t('feeding.food_size_placeholder')" /></div>
+          <div><label>{{ t('feeding.count') }}</label><input type="number" v-model="feedingForm.food_count" min="1" /></div>
           <div><label>{{ t('feeding.weight') }}</label><input type="number" v-model="feedingForm.food_weight_g" step="0.1" min="0" /></div>
           <div class="flex gap-4 items-end pb-2">
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" v-model="feedingForm.live" class="w-4 h-4" />Lebend
+              <input type="checkbox" v-model="feedingForm.live" class="w-4 h-4" />{{ t('feeding.live') }}
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" v-model="feedingForm.accepted" class="w-4 h-4" />Akzeptiert
+              <input type="checkbox" v-model="feedingForm.accepted" class="w-4 h-4" />{{ t('feeding.accepted') }}
             </label>
           </div>
           <div class="sm:col-span-2"><label>{{ t('feeding.notes') }}</label><textarea v-model="feedingForm.notes" rows="2" /></div>
@@ -267,7 +267,7 @@ function sexNotation(sex) {
             <button type="submit" class="btn-primary btn-sm" :disabled="savingFeeding">
               {{ savingFeeding ? t('common.saving') : t('common.save') }}
             </button>
-            <button type="button" class="btn-secondary btn-sm" @click="showFeedingForm = false">Abbrechen</button>
+            <button type="button" class="btn-secondary btn-sm" @click="showFeedingForm = false">{{ t('common.cancel') }}</button>
           </div>
         </form>
       </div>
@@ -278,10 +278,10 @@ function sexNotation(sex) {
         <table v-else class="w-full text-sm">
           <thead>
             <tr class="text-left text-slate-500 border-b border-surface-600">
-              <th class="pb-2 pr-4">Datum</th>
-              <th class="pb-2 pr-4">Futter</th>
-              <th class="pb-2 pr-4">Status</th>
-              <th class="pb-2 pr-4">Notiz</th>
+              <th class="pb-2 pr-4">{{ t('feeding.date') }}</th>
+              <th class="pb-2 pr-4">{{ t('feeding.food_type') }}</th>
+              <th class="pb-2 pr-4">{{ t('animal.status') }}</th>
+              <th class="pb-2 pr-4">{{ t('feeding.notes') }}</th>
               <th class="pb-2"></th>
             </tr>
           </thead>
@@ -291,7 +291,7 @@ function sexNotation(sex) {
               <td class="py-2 pr-4">
                 <span class="text-slate-200">{{ f.food_count > 1 ? `${f.food_count}×` : '' }} {{ f.food_size }} {{ f.food_type }}</span>
                 <span v-if="f.food_weight_g" class="text-slate-500 ml-1">· {{ f.food_weight_g }}g</span>
-                <span v-if="f.live" class="badge-blue ml-1">Lebend</span>
+                <span v-if="f.live" class="badge-blue ml-1">{{ t('feeding.live') }}</span>
               </td>
               <td class="py-2 pr-4">
                 <span :class="f.accepted ? 'badge-green' : 'badge-red'">
@@ -319,7 +319,7 @@ function sexNotation(sex) {
       <div v-if="showSheddingForm" class="card mb-4">
         <h3 class="font-medium text-slate-200 mb-3">{{ t('shedding.add') }}</h3>
         <form @submit.prevent="addShedding" class="grid sm:grid-cols-2 gap-3">
-          <div><label>Datum & Zeit</label><input type="datetime-local" v-model="sheddingForm.date" required /></div>
+          <div><label>{{ t('shedding.date') }}</label><input type="datetime-local" v-model="sheddingForm.date" required /></div>
           <div><label>{{ t('shedding.pre_shed_days') }}</label><input type="number" v-model="sheddingForm.pre_shed_days" min="0" placeholder="7" /></div>
           <div class="flex gap-4 items-end pb-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -334,7 +334,7 @@ function sexNotation(sex) {
             <button type="submit" class="btn-primary btn-sm" :disabled="savingShedding">
               {{ savingShedding ? t('common.saving') : t('common.save') }}
             </button>
-            <button type="button" class="btn-secondary btn-sm" @click="showSheddingForm = false">Abbrechen</button>
+            <button type="button" class="btn-secondary btn-sm" @click="showSheddingForm = false">{{ t('common.cancel') }}</button>
           </div>
         </form>
       </div>
@@ -345,22 +345,22 @@ function sexNotation(sex) {
         <table v-else class="w-full text-sm">
           <thead>
             <tr class="text-left text-slate-500 border-b border-surface-600">
-              <th class="pb-2 pr-4">Datum</th>
-              <th class="pb-2 pr-4">Blauphase</th>
-              <th class="pb-2 pr-4">Status</th>
-              <th class="pb-2 pr-4">Notiz</th>
+              <th class="pb-2 pr-4">{{ t('shedding.date') }}</th>
+              <th class="pb-2 pr-4">{{ t('shedding.pre_shed_days') }}</th>
+              <th class="pb-2 pr-4">{{ t('animal.status') }}</th>
+              <th class="pb-2 pr-4">{{ t('shedding.notes') }}</th>
               <th class="pb-2"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="s in sheddingList" :key="s.id" class="table-row">
               <td class="py-2 pr-4 whitespace-nowrap text-slate-400">{{ fmtDateTime(s.date) }}</td>
-              <td class="py-2 pr-4 text-slate-400">{{ s.pre_shed_days != null ? `${s.pre_shed_days} Tage` : '—' }}</td>
+              <td class="py-2 pr-4 text-slate-400">{{ s.pre_shed_days != null ? `${s.pre_shed_days} ${t('common.days')}` : '—' }}</td>
               <td class="py-2 pr-4">
                 <span :class="s.complete ? 'badge-green' : 'badge-yellow'" class="mr-1">
                   {{ s.complete ? t('shedding.complete_label') : t('shedding.incomplete_label') }}
                 </span>
-                <span v-if="!s.in_one_piece" class="badge-red">Gerissen</span>
+                <span v-if="!s.in_one_piece" class="badge-red">{{ t('shedding.torn') }}</span>
               </td>
               <td class="py-2 pr-4 text-slate-500 max-w-[150px] truncate">{{ s.notes }}</td>
               <td class="py-2">
@@ -375,34 +375,34 @@ function sexNotation(sex) {
     <!-- Custom fields tab -->
     <div v-if="tab === 'custom'">
       <div class="flex justify-between items-center mb-3">
-        <span class="text-sm text-slate-500">Eigene Felder</span>
-        <button class="btn-primary btn-sm" @click="showCfForm = !showCfForm">+ Feld</button>
+        <span class="text-sm text-slate-500">{{ t('animal.custom_fields') }}</span>
+        <button class="btn-primary btn-sm" @click="showCfForm = !showCfForm">+ {{ t('common.add') }}</button>
       </div>
 
       <div v-if="showCfForm" class="card mb-4">
         <form @submit.prevent="addCustomField" class="grid sm:grid-cols-3 gap-3">
-          <div><label>{{ t('animal.custom_fields') }}</label><input v-model="cfForm.field_name" required placeholder="e.g. Enclosure size" /></div>
+          <div><label>{{ t('animal.field_name') }}</label><input v-model="cfForm.field_name" required placeholder="e.g. Enclosure size" /></div>
           <div><label>{{ t('common.value') }}</label><input v-model="cfForm.field_value" placeholder="120×60×60 cm" /></div>
           <div>
-            <label>Typ</label>
+            <label>{{ t('common.type') }}</label>
             <select v-model="cfForm.field_type">
-              <option value="text">Text</option>
-              <option value="number">Zahl</option>
-              <option value="date">Datum</option>
-              <option value="boolean">Ja/Nein</option>
+              <option value="text">{{ t('animal.type_text') }}</option>
+              <option value="number">{{ t('animal.type_number') }}</option>
+              <option value="date">{{ t('animal.type_date') }}</option>
+              <option value="boolean">{{ t('animal.type_boolean') }}</option>
             </select>
           </div>
           <div class="sm:col-span-3 flex gap-2">
             <button type="submit" class="btn-primary btn-sm" :disabled="savingCf">
               {{ savingCf ? t('common.saving') : t('common.add') }}
             </button>
-            <button type="button" class="btn-secondary btn-sm" @click="showCfForm = false">Abbrechen</button>
+            <button type="button" class="btn-secondary btn-sm" @click="showCfForm = false">{{ t('common.cancel') }}</button>
           </div>
         </form>
       </div>
 
       <div class="card">
-        <div v-if="!customFieldList.length" class="text-slate-500 text-center py-8">{{ t('animal.noAnimals') }}</div>
+        <div v-if="!customFieldList.length" class="text-slate-500 text-center py-8">{{ t('animal.noCustomFields') }}</div>
         <div v-for="cf in customFieldList" :key="cf.id"
              class="flex items-center justify-between py-2.5 border-b border-surface-600 last:border-0">
           <div>

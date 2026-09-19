@@ -79,7 +79,7 @@ function fmtDate(d) {
         <div>
           <label>{{ t('feeding.animal') }} *</label>
           <select v-model="form.animal_id" required>
-            <option value="">{{ t('feeding.animal') }}…</option>
+            <option value="">{{ t('feeding.select_animal') }}</option>
             <option v-for="a in allAnimals.filter(a => a.is_active)" :key="a.id" :value="a.id">{{ a.name }}</option>
           </select>
         </div>
@@ -87,10 +87,10 @@ function fmtDate(d) {
         <div><label>{{ t('shedding.pre_shed_days') }}</label><input type="number" v-model="form.pre_shed_days" min="0" placeholder="7" /></div>
         <div class="flex gap-5 items-end pb-2">
           <label class="flex items-center gap-2 cursor-pointer text-sm">
-            <input type="checkbox" v-model="form.complete" class="w-4 h-4" /> Komplett
+            <input type="checkbox" v-model="form.complete" class="w-4 h-4" /> {{ t('shedding.complete') }}
           </label>
           <label class="flex items-center gap-2 cursor-pointer text-sm">
-            <input type="checkbox" v-model="form.in_one_piece" class="w-4 h-4" /> In einem Stück
+            <input type="checkbox" v-model="form.in_one_piece" class="w-4 h-4" /> {{ t('shedding.in_one_piece') }}
           </label>
         </div>
         <div class="sm:col-span-2"><label>{{ t('shedding.notes') }}</label><textarea v-model="form.notes" rows="2" /></div>
@@ -110,7 +110,7 @@ function fmtDate(d) {
             <th class="pb-2 pr-4">{{ t('feeding.animal') }}</th>
             <th class="pb-2 pr-4">{{ t('shedding.date') }}</th>
             <th class="pb-2 pr-4">{{ t('shedding.pre_shed_days') }}</th>
-            <th class="pb-2 pr-4">Status</th>
+            <th class="pb-2 pr-4">{{ t('animal.status') }}</th>
             <th class="pb-2 pr-4">{{ t('shedding.notes') }}</th>
             <th class="pb-2"></th>
           </tr>
@@ -119,7 +119,7 @@ function fmtDate(d) {
           <tr v-for="s in list" :key="s.id" class="table-row">
             <td class="py-2 pr-4 font-medium text-slate-200">{{ s.animal_name }}</td>
             <td class="py-2 pr-4 text-slate-400 whitespace-nowrap">{{ fmtDate(s.date) }}</td>
-            <td class="py-2 pr-4 text-slate-400">{{ s.pre_shed_days != null ? `${s.pre_shed_days} Tage` : '—' }}</td>
+            <td class="py-2 pr-4 text-slate-400">{{ s.pre_shed_days != null ? `${s.pre_shed_days} ${t('common.days')}` : '—' }}</td>
             <td class="py-2 pr-4">
               <span :class="s.complete ? 'badge-green' : 'badge-yellow'" class="mr-1">
                 {{ s.complete ? t('shedding.complete_label') : t('shedding.incomplete_label') }}

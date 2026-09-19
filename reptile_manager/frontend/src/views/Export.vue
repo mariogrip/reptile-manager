@@ -131,7 +131,7 @@ function sexClass(sex) {
       <h2 class="font-semibold text-slate-200 mb-1">{{ t('export.inventory_title') }}</h2>
       <p class="text-sm text-slate-500 mb-4">{{ t('export.inventory_desc') }}</p>
       <button class="btn-primary" :disabled="genInv" @click="downloadInventory">
-        {{ genInv ? '⏳ …' : t('export.inventory_btn') }}
+        {{ genInv ? t('export.generating') : t('export.inventory_btn') }}
       </button>
     </div>
 
@@ -218,7 +218,7 @@ function sexClass(sex) {
                 {{ t(key) }}
               </label>
               <div v-if="originType === 'einfuhr'" class="grid grid-cols-2 gap-2 mt-2 ml-6">
-                <input v-model="citesNr"   placeholder="Cites-Nr" class="text-sm" />
+                <input v-model="citesNr"   :placeholder="t('export.cites_nr')" class="text-sm" />
                 <input v-model="einfuhrNr" :placeholder="t('export.einfuhr_nr')" class="text-sm" />
               </div>
               <input v-if="originType === 'sonstiges'" v-model="sonstigesText"

@@ -51,7 +51,7 @@ function sexClass(sex) {
   <div>
     <h1 class="text-xl md:text-2xl font-bold text-slate-200 mb-5">{{ t('dashboard.title') }}</h1>
 
-    <div v-if="loading" class="text-slate-500 text-center py-16">Lade…</div>
+    <div v-if="loading" class="text-slate-500 text-center py-16">{{ t('common.loading') }}</div>
 
     <template v-else-if="stats">
       <!-- Stat cards -->
@@ -102,14 +102,14 @@ function sexClass(sex) {
             <h2 class="font-semibold text-slate-200 text-sm md:text-base">{{ t('dashboard.recent_feedings') }}</h2>
             <button class="text-xs text-brand-400 hover:text-brand-500" @click="router.push('/feedings')">{{ t('common.all') }} →</button>
           </div>
-          <div v-if="!stats.recent_feedings.length" class="text-slate-500 text-sm">{{ t('common.unknown') }}</div>
+          <div v-if="!stats.recent_feedings.length" class="text-slate-500 text-sm">{{ t('feeding.noEntries') }}</div>
           <div v-for="f in stats.recent_feedings" :key="f.id"
                class="flex items-center gap-2 py-2 border-b border-surface-600 last:border-0">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-sm font-medium text-slate-200 truncate">{{ f.animal_name }}</span>
                 <span :class="f.accepted ? 'badge-green' : 'badge-red'" class="text-xs">
-                  {{ f.accepted ? 'OK' : 'Abgelehnt' }}
+                  {{ f.accepted ? t('feeding.accepted_label') : t('feeding.rejected_label') }}
                 </span>
               </div>
               <span class="text-xs text-slate-500">{{ foodLabel(f) }} · {{ fmtDate(f.date) }}</span>
@@ -123,14 +123,14 @@ function sexClass(sex) {
             <h2 class="font-semibold text-slate-200 text-sm md:text-base">{{ t('dashboard.recent_sheddings') }}</h2>
             <button class="text-xs text-brand-400 hover:text-brand-500" @click="router.push('/sheddings')">{{ t('common.all') }} →</button>
           </div>
-          <div v-if="!stats.recent_sheddings.length" class="text-slate-500 text-sm">{{ t('common.unknown') }}</div>
+          <div v-if="!stats.recent_sheddings.length" class="text-slate-500 text-sm">{{ t('shedding.noEntries') }}</div>
           <div v-for="s in stats.recent_sheddings" :key="s.id"
                class="flex items-center gap-2 py-2 border-b border-surface-600 last:border-0">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-sm font-medium text-slate-200 truncate">{{ s.animal_name }}</span>
                 <span :class="s.complete ? 'badge-green' : 'badge-yellow'" class="text-xs">
-                  {{ s.complete ? 'Komplett' : 'Unvollständig' }}
+                  {{ s.complete ? t('shedding.complete_label') : t('shedding.incomplete_label') }}
                 </span>
               </div>
               <span class="text-xs text-slate-500">{{ fmtDate(s.date) }}</span>
