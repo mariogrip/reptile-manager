@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3] – 2026-09-19
+
+### Fixed
+- Creating an animal (and any other list/create call) failed with `502` behind Home Assistant Ingress: the frontend calls `/api/animals` (no trailing slash) while the backend only registered `/api/animals/`, so FastAPI answered `307 Temporary Redirect` — the redirect drops the ingress path prefix and Home Assistant returns `502`. All collection routes (`animals`, `feedings`, `sheddings`, `breeding`) now serve both variants directly, no redirect involved.
+
+---
+
 ## [1.2.2] – 2025-06-04
 
 ### Fixed
