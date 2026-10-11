@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.7] – 2026-10-11
+
+### Changed
+- The add-on changelog shown in Home Assistant is now the full project changelog (it previously stopped at 1.1.1)
+
+---
+
 ## [1.2.6] – 2026-10-11
 
 ### Fixed
