@@ -46,12 +46,27 @@ import io, csv
 
 # ── Inventory CSV export ──────────────────────────────────────────────────────
 
+INVENTORY_HEADERS = {
+    "en": ["Animal no.", "Name", "Scientific name", "Common name",
+           "Sex", "Morph", "Date of birth", "Weight (g)", "Length (cm)",
+           "Substrate", "Enclosure", "Temp. day °C", "Temp. night °C",
+           "Humidity %", "Status"],
+    "de": ["Tier-Nr.", "Name", "Wissenschaftlicher Name", "Trivialname",
+           "Geschlecht", "Morph", "Geburtsdatum", "Gewicht (g)", "Länge (cm)",
+           "Substrat", "Terrarium", "Temp. Tag °C", "Temp. Nacht °C",
+           "Luftfeuchtigkeit %", "Status"],
+}
+INVENTORY_FILENAME = {"en": "inventory", "de": "bestandsliste"}
+
 @router.get("/inventory")
 def export_inventory(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(_get_user_flex),
     token: Optional[str] = Query(None),
+    lang: str = Query("en"),
 ):
+    if lang not in INVENTORY_HEADERS:
+        lang = "en"
     animals = (db.query(models.Animal)
                .filter(models.Animal.status == "active")
                .order_by(models.Animal.species, models.Animal.name)
@@ -59,10 +74,7 @@ def export_inventory(
 
     out = io.StringIO()
     w = csv.writer(out, delimiter=";", quoting=csv.QUOTE_MINIMAL)
-    w.writerow(["Tier-Nr.", "Name", "Wissenschaftlicher Name", "Trivialname",
-                "Geschlecht", "Morph", "Geburtsdatum", "Gewicht (g)", "Länge (cm)",
-                "Substrat", "Terrarium", "Temp. Tag °C", "Temp. Nacht °C",
-                "Luftfeuchtigkeit %", "Status"])
+    w.writerow(INVENTORY_HEADERS[lang])
     for a in animals:
         w.writerow([
             a.tracking_id or a.id,
@@ -71,7 +83,7 @@ def export_inventory(
             a.common_name or "",
             _sex_notation(a.sex),
             a.morph or "",
-            _fmt_date(a.date_of_birth),
+            (_fmt_date(a.date_of_birth) if lang == "de" else a.date_of_birth.isoformat()) if a.date_of_birth else "",
             a.weight_g or "",
             a.length_cm or "",
             a.substrate or "",
@@ -82,8 +94,8 @@ def export_inventory(
             a.status or "active",
         ])
 
-    content = "\ufeff" + out.getvalue()   # UTF-8 BOM — Excel öffnet Umlaute korrekt
-    fname = f"bestandsliste_{datetime.now().strftime('%Y%m%d')}.csv"
+    content = "\ufeff" + out.getvalue()   # UTF-8 BOM so Excel reads non-ASCII characters correctly
+    fname = f"{INVENTORY_FILENAME[lang]}_{datetime.now().strftime('%Y%m%d')}.csv"
     return Response(
         content=content.encode("utf-8"),
         media_type="text/csv; charset=utf-8",
@@ -111,9 +123,6 @@ def _cb(checked, text_str, styles):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
     ]))
     return t
-    return {"male": "Männlich", "female": "Weiblich", "unknown": "Unbekannt"}.get(
-        sex.value if hasattr(sex, "value") else str(sex), "?"
-    )
 
 def _sex_notation(sex):
     """Reptile/spider standard notation: male.female.unknown"""
@@ -148,6 +157,49 @@ def _pdf_response(buf, filename):
 
 # ── Herkunftsnachweis ─────────────────────────────────────────────────────────
 
+HKN_TEXT = {
+    "en": {
+        "title": "PROOF OF ORIGIN",
+        "subtitle": "Proof of origin as evidence of legality according to § 46 BNatSchG",
+        "name": "Name", "street": "Street", "zip_city": "Postcode/City", "phone": "Phone",
+        "seller": "Seller / Breeder", "buyer": "Buyer / Recipient",
+        "declaration": "I declare that the following animals handed over by me:",
+        "headers": ["Qty", "Sex", "Scientific name", "Animal no.", "Origin"],
+        "mother": "Mother", "father": "Father",
+        "bestand": "originate from my legal stock",
+        "nachzucht": "originate from my legal captive breeding",
+        "einfuhr": "originate from an approved import",
+        "cites_nr": "CITES no.", "einfuhr_nr": "Import no.",
+        "sonstiges": "Other",
+        "place_date": "{place}, {date}",
+        "signature": "Signature <b>{who}</b>",
+        "footer": "Proof of origin as evidence of legality according to § 46 BNatSchG",
+        "created": "Created with Reptile Manager on {date}",
+        "date_fmt": "%d/%m/%Y",
+        "filename": "proof_of_origin",
+    },
+    "de": {
+        "title": "HERKUNFTSNACHWEIS",
+        "subtitle": "Herkunftsnachweis zum Nachweis der Legalität nach § 46 BNatSchG",
+        "name": "Name", "street": "Straße", "zip_city": "PLZ/Ort", "phone": "Telefon",
+        "seller": "Verkäufer / Züchter", "buyer": "Käufer / Erwerber",
+        "declaration": "Ich versichere, dass folgende, von mir abgegebenen Tiere:",
+        "headers": ["Anz.", "Gesch.", "Wissenschaftlicher Name", "Tier-Nr.", "Herkunft von"],
+        "mother": "Mutter", "father": "Vater",
+        "bestand": "aus meinem legalen Bestand stammen",
+        "nachzucht": "aus meiner legalen Nachzucht stammen",
+        "einfuhr": "aus genehmigter Einfuhr stammen",
+        "cites_nr": "Cites-Nr", "einfuhr_nr": "Einfuhr-Nr",
+        "sonstiges": "Sonstiges",
+        "place_date": "{place}, den {date}",
+        "signature": "Unterschrift <b>{who}</b>",
+        "footer": "Herkunftsnachweis zum Nachweis der Legalität nach § 46 BNatSchG",
+        "created": "Erstellt mit Reptile Manager am {date}",
+        "date_fmt": "%d.%m.%Y",
+        "filename": "herkunftsnachweis",
+    },
+}
+
 class HerkunftsnachweisRequest(BaseModel):
     animal_ids: List[int]
     buyer_name:     str = ""
@@ -160,6 +212,7 @@ class HerkunftsnachweisRequest(BaseModel):
     sonstiges_text: str = ""
     ort_datum:      str = ""
     blanko:         bool = False
+    lang:           str = "en"      # en | de
 
 
 @router.post("/herkunftsnachweis")
@@ -168,6 +221,8 @@ def export_herkunftsnachweis(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(_get_user_flex),
 ):
+    L    = HKN_TEXT.get(req.lang, HKN_TEXT["en"])
+    today = datetime.now().strftime(L["date_fmt"])
     cfg  = db.query(models.HAConfig).first()
     tiere = (db.query(models.Animal)
               .filter(models.Animal.id.in_(req.animal_ids))
@@ -183,9 +238,9 @@ def export_herkunftsnachweis(
     els = []
 
     # ── Title ──
-    els.append(Paragraph("HERKUNFTSNACHWEIS", s["h1"]))
+    els.append(Paragraph(L["title"], s["h1"]))
     els.append(Paragraph(
-        "Herkunftsnachweis zum Nachweis der Legalität nach § 46 BNatSchG",
+        L["subtitle"],
         ParagraphStyle("legal2", fontName="Helvetica-Bold", fontSize=9,
                        alignment=TA_CENTER, textColor=GREY, spaceAfter=5*mm)
     ))
@@ -199,17 +254,17 @@ def export_herkunftsnachweis(
     def info_cell(label, name, street, plz, phone):
         lines = (
             f"<b>{label}</b><br/>"
-            f"Name: {name or '___________________________'}<br/>"
-            f"Straße: {street or '___________________________'}<br/>"
-            f"PLZ/Ort: {plz or '___________________________'}<br/>"
-            f"Telefon: {phone or '___________________________'}"
+            f"{L['name']}: {name or '___________________________'}<br/>"
+            f"{L['street']}: {street or '___________________________'}<br/>"
+            f"{L['zip_city']}: {plz or '___________________________'}<br/>"
+            f"{L['phone']}: {phone or '___________________________'}"
         )
         return Paragraph(lines, ParagraphStyle("cell", fontName="Helvetica",
                                                 fontSize=9, leading=14))
 
     contact_table = Table(
-        [[info_cell("Verkäufer / Züchter", seller_name, seller_str, seller_plz, seller_tel),
-          info_cell("Käufer / Erwerber", req.buyer_name, req.buyer_street, req.buyer_zip_city, req.buyer_phone)]],
+        [[info_cell(L["seller"], seller_name, seller_str, seller_plz, seller_tel),
+          info_cell(L["buyer"], req.buyer_name, req.buyer_street, req.buyer_zip_city, req.buyer_phone)]],
         colWidths=[83*mm, 83*mm],
     )
     contact_table.setStyle(TableStyle([
@@ -224,19 +279,19 @@ def export_herkunftsnachweis(
 
     # ── Declaration ──
     els.append(Paragraph(
-        "Ich versichere, dass folgende, von mir abgegebenen Tiere:",
+        L["declaration"],
         ParagraphStyle("decl", fontName="Helvetica-Bold", fontSize=10, spaceAfter=3*mm)
     ))
 
     # ── Animal table ──
-    ah = ["Anz.", "Gesch.", "Wissenschaftlicher Name", "Tier-Nr.", "Herkunft von"]
+    ah = L["headers"]
     animal_rows = [ah]
     for a in tiere_ordered:
         mother = db.query(models.Animal).filter(models.Animal.id == a.mother_id).first() if a.mother_id else None
         father = db.query(models.Animal).filter(models.Animal.id == a.father_id).first() if a.father_id else None
         eltern = []
-        if mother: eltern.append(f"Mutter: {mother.name} #{mother.tracking_id or mother.id}")
-        if father: eltern.append(f"Vater: {father.name} #{father.tracking_id or father.id}")
+        if mother: eltern.append(f"{L['mother']}: {mother.name} #{mother.tracking_id or mother.id}")
+        if father: eltern.append(f"{L['father']}: {father.name} #{father.tracking_id or father.id}")
         animal_rows.append([
             "1",
             _sex_notation(a.sex),
@@ -262,18 +317,18 @@ def export_herkunftsnachweis(
 
     # ── Checkboxes ──
     els.append(Spacer(1, 2*mm))
-    els.append(_cb(req.origin_type == "bestand",   "aus meinem legalen Bestand stammen", s))
+    els.append(_cb(req.origin_type == "bestand",   L["bestand"], s))
     els.append(Spacer(1, 1*mm))
-    els.append(_cb(req.origin_type == "nachzucht", "aus meiner legalen Nachzucht stammen", s))
+    els.append(_cb(req.origin_type == "nachzucht", L["nachzucht"], s))
     els.append(Spacer(1, 1*mm))
 
-    cites_line = "aus genehmigter Einfuhr stammen"
+    cites_line = L["einfuhr"]
     if req.origin_type == "einfuhr" and (req.cites_nr or req.einfuhr_nr):
-        cites_line += f"  (Cites-Nr: {req.cites_nr or '—'}   Einfuhr-Nr: {req.einfuhr_nr or '—'})"
+        cites_line += f"  ({L['cites_nr']}: {req.cites_nr or '—'}   {L['einfuhr_nr']}: {req.einfuhr_nr or '—'})"
     els.append(_cb(req.origin_type == "einfuhr", cites_line, s))
     els.append(Spacer(1, 1*mm))
 
-    sonst = "Sonstiges"
+    sonst = L["sonstiges"]
     if req.origin_type == "sonstiges" and req.sonstiges_text:
         sonst += f": {req.sonstiges_text}"
     els.append(_cb(req.origin_type == "sonstiges", sonst, s))
@@ -282,8 +337,7 @@ def export_herkunftsnachweis(
 
     # ── Ort / Datum (pre-filled) ──
     ort_name  = req.ort_datum.strip() if req.ort_datum else "_______________"
-    datum_str = datetime.now().strftime("%d.%m.%Y")
-    ort_line  = f"{ort_name}, den {datum_str}"
+    ort_line  = L["place_date"].format(place=ort_name, date=today)
 
     ort_table = Table(
         [[Paragraph(ort_line, s["body"]), Paragraph("", s["body"])]],
@@ -304,8 +358,8 @@ def export_herkunftsnachweis(
         [
             [HRFlowable(width=80*mm, thickness=0.6, color=BLACK),
              HRFlowable(width=80*mm, thickness=0.6, color=BLACK)],
-            [Paragraph("Unterschrift <b>Verkäufer / Züchter</b>", s["small"]),
-             Paragraph("Unterschrift <b>Käufer / Erwerber</b>",   s["small"])],
+            [Paragraph(L["signature"].format(who=L["seller"]), s["small"]),
+             Paragraph(L["signature"].format(who=L["buyer"]),  s["small"])],
         ],
         colWidths=[83*mm, 83*mm],
         rowHeights=[2*mm, 5*mm],
@@ -320,12 +374,12 @@ def export_herkunftsnachweis(
     els.append(HRFlowable(width="100%", thickness=0.5, color=BORDER))
     els.append(Spacer(1, 2*mm))
     els.append(Paragraph(
-        f"Herkunftsnachweis zum Nachweis der Legalität nach § 46 BNatSchG &nbsp;|&nbsp; "
-        f"Erstellt mit Reptile Manager am {datetime.now().strftime('%d.%m.%Y')} &nbsp;|&nbsp; "
+        f"{L['footer']} &nbsp;|&nbsp; "
+        f"{L['created'].format(date=today)} &nbsp;|&nbsp; "
         f"github.com/mariogrip/reptile-manager",
         s["legal"]
     ))
 
     doc.build(els)
-    fname = f"herkunftsnachweis_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+    fname = f"{L['filename']}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
     return _pdf_response(buf, fname)

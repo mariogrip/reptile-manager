@@ -1,5 +1,5 @@
 <script setup>
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDate } from '@/i18n'
 import { ref, onMounted, watch, nextTick, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { animals as animalsApi } from '@/api'
@@ -217,7 +217,7 @@ async function draw(canvas, dpi) {
   const lines = []
 
   if (c.show_sex)    lines.push(a.sex === 'male' ? '1.0.0' : a.sex === 'female' ? '0.1.0' : '0.0.1')
-  if (c.show_dob && a.date_of_birth) lines.push(`* ${new Date(a.date_of_birth).toLocaleDateString('de-DE')}`)
+  if (c.show_dob && a.date_of_birth) lines.push(`* ${fmtDate(a.date_of_birth)}`)
   if (c.show_weight && a.weight_g)   lines.push(`⚖ ${a.weight_g}g`)
 
   // Haltungsbedingungen

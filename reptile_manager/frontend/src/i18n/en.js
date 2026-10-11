@@ -161,7 +161,7 @@ export default {
     breeder_profile: '🏷 Breeder / seller profile',
     breeder_hint: 'This data is automatically added to origin certificates.',
     breeder_name: 'Name', breeder_phone: 'Phone',
-    breeder_street: 'Street', breeder_zip: 'Postcode / City',
+    breeder_street: 'Street', breeder_street_placeholder: '123 Example Street', breeder_zip: 'Postcode / City',
     ha_subtitle: 'Send events to HA · Provide sensors',
     ha_url_hint: 'Internally reachable URL of your HA instance',
     token_placeholder: 'Leave empty to keep',

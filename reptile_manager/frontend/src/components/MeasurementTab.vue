@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDateTime } from '@/i18n'
 import MeasurementChart from '@/components/MeasurementChart.vue'
 
 const props = defineProps({
@@ -22,7 +22,6 @@ const saving = ref(false)
 
 const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
 
-function fmtDateTime(d) { return d ? new Date(d).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—' }
 
 async function add() {
   saving.value = true

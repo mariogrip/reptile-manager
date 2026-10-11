@@ -1,5 +1,5 @@
 <script setup>
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDateTime } from '@/i18n'
 import { ref, onMounted, watch } from 'vue'
 import { feedings as feedingsApi, animals as animalsApi } from '@/api'
 
@@ -57,9 +57,6 @@ async function deleteFeeding(id) {
   list.value = list.value.filter(f => f.id !== id)
 }
 
-function fmtDateTime(d) {
-  return d ? new Date(d).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—'
-}
 </script>
 
 <template>

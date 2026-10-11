@@ -1,12 +1,12 @@
 <script setup>
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDate, dateLocale } from '@/i18n'
 import { ref, computed, onMounted } from 'vue'
 import { dashboard } from '@/api'
 import { useRouter } from 'vue-router'
 import { mediaUrl } from '@/utils/media'
 import Sparkline from '@/components/Sparkline.vue'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 const router = useRouter()
 const stats = ref(null)
@@ -33,7 +33,6 @@ const weightTrends = computed(() => {
     .sort((a, b) => (a.pct ?? Infinity) - (b.pct ?? Infinity) || a.name.localeCompare(b.name))
 })
 const visibleTrends = computed(() => showAllTrends.value ? weightTrends.value : weightTrends.value.slice(0, TREND_LIMIT))
-const dateLocale = computed(() => locale.value === 'de' ? 'de-DE' : 'en-GB')
 
 onMounted(async () => {
   try {
@@ -44,14 +43,6 @@ onMounted(async () => {
   }
 })
 
-function fmtDate(d) {
-  if (!d) return '—'
-  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
-}
-function fmtDateTime(d) {
-  if (!d) return '—'
-  return new Date(d).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-}
 function foodLabel(f) {
   return [f.food_count > 1 ? `${f.food_count}×` : '', f.food_size, f.food_type].filter(Boolean).join(' ')
 }
@@ -139,7 +130,7 @@ function sexClass(sex) {
               <span v-else class="text-slate-600">{{ t('dashboard.weight_single') }}</span>
               <span v-if="a.pct !== null && a.pct <= LOSS_WARN_PCT" class="badge-yellow whitespace-nowrap">⚠ {{ t('dashboard.weight_loss') }}</span>
             </div>
-            <Sparkline :points="a.points" unit="g" :locale="dateLocale" />
+            <Sparkline :points="a.points" unit="g" :locale="dateLocale()" />
           </div>
         </div>
         <button v-if="weightTrends.length > TREND_LIMIT" class="text-xs text-brand-400 hover:text-brand-500 mt-3"

@@ -161,7 +161,7 @@ export default {
     breeder_profile: '🏷 Züchter / Verkäufer Profil',
     breeder_hint: 'Diese Daten werden automatisch in Herkunftsnachweise eingetragen.',
     breeder_name: 'Name', breeder_phone: 'Telefon',
-    breeder_street: 'Straße', breeder_zip: 'PLZ / Ort',
+    breeder_street: 'Straße', breeder_street_placeholder: 'Musterstraße 1', breeder_zip: 'PLZ / Ort',
     ha_subtitle: 'Events an HA senden · Sensoren bereitstellen',
     ha_url_hint: 'Intern erreichbare URL deiner HA-Instanz',
     token_placeholder: 'Leer lassen um beizubehalten',

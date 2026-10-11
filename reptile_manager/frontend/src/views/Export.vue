@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from '@/i18n'
 import { animals as animalsApi, exportApi, buildBaseURL } from '@/api'
 
-const { t }  = useI18n()
+const { t, locale } = useI18n()
 const route  = useRoute()
 
 const allAnimals      = ref([])
@@ -56,7 +56,7 @@ function toggleAnimal(id) {
 function getDownloadUrl(path) {
   const base  = buildBaseURL().replace(/\/api\/?$/, '/api')
   const token = localStorage.getItem('access_token') || ''
-  return `${base}${path}?token=${encodeURIComponent(token)}`
+  return `${base}${path}?token=${encodeURIComponent(token)}&lang=${locale.value}`
 }
 
 async function downloadInventory() {
@@ -89,12 +89,13 @@ async function downloadHkn() {
       sonstiges_text: sonstigesText.value,
       ort_datum:      blanko.value ? '' : ort.value,
       blanko:         blanko.value,
+      lang:           locale.value,
     })
     const blob = new Blob([res.data], { type: 'application/pdf' })
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement('a')
     a.href = url
-    a.download = `herkunftsnachweis${blanko.value ? '_blanko' : ''}_${new Date().toISOString().slice(0,10)}.pdf`
+    a.download = `${locale.value === 'de' ? 'herkunftsnachweis' : 'proof_of_origin'}${blanko.value ? (locale.value === 'de' ? '_blanko' : '_blank') : ''}_${new Date().toISOString().slice(0,10)}.pdf`
     document.body.appendChild(a); a.click(); document.body.removeChild(a)
     setTimeout(() => URL.revokeObjectURL(url), 2000)
   } catch (e) {

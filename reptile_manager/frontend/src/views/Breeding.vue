@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { breeding as breedingApi, animals as animalsApi } from '@/api'
 import { bulk } from '@/api'
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDate } from '@/i18n'
 
 const { t } = useI18n()
 
@@ -84,7 +84,6 @@ async function remove(id) {
   list.value = list.value.filter(e => e.id !== id)
 }
 
-function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-DE') : '—' }
 
 // Bulk offspring
 const showBulkModal  = ref(false)

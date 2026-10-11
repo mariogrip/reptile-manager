@@ -1,5 +1,5 @@
 <script setup>
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDateTime } from '@/i18n'
 import { ref, onMounted, watch } from 'vue'
 import { sheddings as sheddingsApi, animals as animalsApi } from '@/api'
 
@@ -54,9 +54,6 @@ async function deleteShedding(id) {
   list.value = list.value.filter(s => s.id !== id)
 }
 
-function fmtDate(d) {
-  return d ? new Date(d).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—'
-}
 </script>
 
 <template>
@@ -118,7 +115,7 @@ function fmtDate(d) {
         <tbody>
           <tr v-for="s in list" :key="s.id" class="table-row">
             <td class="py-2 pr-4 font-medium text-slate-200">{{ s.animal_name }}</td>
-            <td class="py-2 pr-4 text-slate-400 whitespace-nowrap">{{ fmtDate(s.date) }}</td>
+            <td class="py-2 pr-4 text-slate-400 whitespace-nowrap">{{ fmtDateTime(s.date) }}</td>
             <td class="py-2 pr-4 text-slate-400">{{ s.pre_shed_days != null ? `${s.pre_shed_days} ${t('common.days')}` : '—' }}</td>
             <td class="py-2 pr-4">
               <span :class="s.complete ? 'badge-green' : 'badge-yellow'" class="mr-1">

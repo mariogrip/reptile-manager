@@ -1,10 +1,8 @@
-# Neue Sprache hinzufügen
+# Adding a new language
 
-So einfach geht's:
+## Step 1 – Create the translation file
 
-## Schritt 1 – Übersetzungsdatei erstellen
-
-`src/i18n/es.js` anlegen und an `de.js` orientieren:
+Create `src/i18n/es.js`, using `en.js` as the template:
 
 ```js
 export default {
@@ -13,29 +11,28 @@ export default {
     animals: 'Animales',
     // ...
   },
-  // alle anderen Schlüssel aus de.js ergänzen
+  // add all other keys from en.js
 }
 ```
 
-Fehlende Schlüssel fallen automatisch auf Deutsch zurück (fallbackLocale: 'de').
+Missing keys automatically fall back to English.
 
-## Schritt 2 – In index.js registrieren
+## Step 2 – Register it in index.js
 
 ```js
 import es from './es'
 
+const messages = { en, de, es }  // <-- add here
+
 export const languages = {
-  de: { name: 'Deutsch',  flag: '🇩🇪' },
   en: { name: 'English',  flag: '🇬🇧' },
-  es: { name: 'Español',  flag: '🇪🇸' },  // <-- neu
+  de: { name: 'Deutsch',  flag: '🇩🇪' },
+  es: { name: 'Español',  flag: '🇪🇸' },  // <-- and here
 }
 
-const i18n = createI18n({
-  // ...
-  messages: { de, en, es },  // <-- hier auch
-})
+const dateLocales = { en: 'en-GB', de: 'de-DE', es: 'es-ES' }  // <-- date format
 ```
 
-## Fertig
+## Done
 
-Die neue Sprache erscheint automatisch in der Sprachauswahl unter Einstellungen.
+The new language appears automatically in the language picker.

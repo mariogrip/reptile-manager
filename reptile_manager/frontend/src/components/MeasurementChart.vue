@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useI18n } from '@/i18n'
+import { useI18n, dateLocale } from '@/i18n'
 
 const props = defineProps({
   // [{ date, [field] }] in any order
@@ -10,7 +10,7 @@ const props = defineProps({
   ns: { type: String, required: true },     // i18n namespace: 'weight' | 'length'
 })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 const LINE = '#4ade80'      // brand-400
 const SURFACE = '#1c2230'   // surface-700 (card background)
@@ -101,12 +101,11 @@ const path = computed(() => {
 })
 
 const spanDays = computed(() => scales.value ? (scales.value.tMax - scales.value.tMin) / 86400000 : 0)
-const loc = computed(() => locale.value === 'de' ? 'de-DE' : 'en-GB')
 function fmtTick(ts) {
   const opts = spanDays.value > 400 ? { month: 'short', year: '2-digit' } : { day: 'numeric', month: 'short' }
-  return new Date(ts).toLocaleDateString(loc.value, opts)
+  return new Date(ts).toLocaleDateString(dateLocale(), opts)
 }
-function fmtDate(ts) { return new Date(ts).toLocaleDateString(loc.value, { day: '2-digit', month: 'short', year: 'numeric' }) }
+function fmtDate(ts) { return new Date(ts).toLocaleDateString(dateLocale(), { day: '2-digit', month: 'short', year: 'numeric' }) }
 function fmtVal(v) { return `${+v.toFixed(1)} ${props.unit}` }
 
 // ── Hover: nearest point by x ────────────────────────────────────────────────

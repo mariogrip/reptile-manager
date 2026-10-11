@@ -88,7 +88,7 @@ async function syncNow() {
         </p>
       </div>
 
-      <!-- Züchter/Verkäufer Profil -->
+      <!-- Breeder / seller profile -->
       <div class="card">
         <h2 class="font-semibold text-slate-200 mb-1">{{ t('settings.breeder_profile') }}</h2>
         <p class="text-sm text-slate-500 mb-4">
@@ -97,7 +97,7 @@ async function syncNow() {
         <div class="grid sm:grid-cols-2 gap-4">
           <div><label>{{ t('settings.breeder_name') }}</label><input v-model="config.breeder_name"     placeholder="Max Mustermann" /></div>
           <div><label>{{ t('settings.breeder_phone') }}</label><input v-model="config.breeder_phone" placeholder="+49 …" /></div>
-          <div><label>{{ t('settings.breeder_street') }}</label><input v-model="config.breeder_street"   placeholder="Musterstraße 1" /></div>
+          <div><label>{{ t('settings.breeder_street') }}</label><input v-model="config.breeder_street"   :placeholder="t('settings.breeder_street_placeholder')" /></div>
           <div><label>{{ t('settings.breeder_zip') }}</label><input v-model="config.breeder_zip_city" placeholder="12345 Musterstadt" /></div>
         </div>
       </div>
@@ -189,42 +189,42 @@ async function syncNow() {
         <p class="text-sm text-slate-400 mb-3">
           {{ t('settings.yaml_hint') }}
         </p>
-        <pre v-pre class="bg-surface-900 rounded-lg p-4 text-xs text-slate-300 overflow-x-auto"><code># Schritt 1: REST-Sensor (einen Datenpunkt laden)
+        <pre v-pre class="bg-surface-900 rounded-lg p-4 text-xs text-slate-300 overflow-x-auto"><code># Step 1: REST sensor (loads a single data point)
 sensor:
   - platform: rest
-    resource: http://DEIN_SERVER:8000/api/ha/sensors
+    resource: http://YOUR_SERVER:8000/api/ha/sensors
     scan_interval: 300
     name: reptile_manager_data
     json_attributes:
       - summary
       - animals
 
-# Schritt 2: Template-Sensoren daraus ableiten
+# Step 2: Derive template sensors from it
 template:
   - sensor:
-      - name: "Reptilien aktiv"
+      - name: "Reptiles active"
         state: "{{ state_attr('sensor.reptile_manager_data', 'summary')['active_animals'] | default(0) }}"
-        unit_of_measurement: "Tiere"
+        unit_of_measurement: "animals"
         icon: mdi:snake
 
-      - name: "Reptilien nicht gefüttert"
+      - name: "Reptiles not fed"
         state: "{{ state_attr('sensor.reptile_manager_data', 'summary')['animals_not_fed'] | default(0) }}"
-        unit_of_measurement: "Tiere"
+        unit_of_measurement: "animals"
         icon: mdi:food-off
 
-# Schritt 3: Automation
+# Step 3: Automation
 automation:
-  - alias: "Reptilien Fütterungswarnung"
+  - alias: "Reptile feeding warning"
     trigger:
       - platform: numeric_state
-        entity_id: sensor.reptilien_nicht_gefuettert
+        entity_id: sensor.reptiles_not_fed
         above: 0
     action:
-      - service: notify.mobile_app_dein_handy
+      - service: notify.mobile_app_your_phone
         data:
           message: >
-            {{ states('sensor.reptilien_nicht_gefuettert') }}
-            Reptilien brauchen Futter!</code></pre>
+            {{ states('sensor.reptiles_not_fed') }}
+            reptiles need feeding!</code></pre>
       </div>
 
       <!-- Webhook info -->

@@ -5,7 +5,7 @@ const props = defineProps({
   // [{ t: ms timestamp, v: number }] oldest first
   points: { type: Array, required: true },
   unit: { type: String, default: '' },
-  locale: { type: String, default: 'de-DE' },
+  locale: { type: String, default: 'en-GB' },
   height: { type: Number, default: 48 },
 })
 

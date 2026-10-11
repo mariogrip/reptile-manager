@@ -12,10 +12,10 @@ def _enrich(event: models.BreedingEvent, db: Session) -> schemas.BreedingEventRe
     male   = db.query(models.Animal).filter(models.Animal.id == event.male_id).first()
     # Fallback if an animal was deleted
     if not female:
-        female = models.Animal(id=event.female_id, name=f"[gelöscht #{event.female_id}]",
+        female = models.Animal(id=event.female_id, name=f"[deleted #{event.female_id}]",
                                species="?", sex=models.Sex.unknown, status="inactive")
     if not male:
-        male   = models.Animal(id=event.male_id,   name=f"[gelöscht #{event.male_id}]",
+        male   = models.Animal(id=event.male_id,   name=f"[deleted #{event.male_id}]",
                                species="?", sex=models.Sex.unknown, status="inactive")
     data = {k: v for k, v in event.__dict__.items() if not k.startswith("_")}
     data["female"] = schemas.AnimalSummary.model_validate(female)

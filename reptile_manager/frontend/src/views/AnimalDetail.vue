@@ -1,5 +1,5 @@
 <script setup>
-import { useI18n } from '@/i18n'
+import { useI18n, fmtDate, fmtDateTime } from '@/i18n'
 import { ref, onMounted } from 'vue'
 import { mediaUrl } from '@/utils/media'
 import { useRoute, useRouter } from 'vue-router'
@@ -53,8 +53,6 @@ onMounted(async () => {
   loading.value = false
 })
 
-function fmtDate(d) { return d ? new Date(d).toLocaleDateString('de-DE') : '—' }
-function fmtDateTime(d) { return d ? new Date(d).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—' }
 function age(dob) {
   if (!dob) return null
   const d = new Date(dob), now = new Date()

@@ -1,7 +1,7 @@
 name: "Reptile Manager"
 version: "1.2.4"
 slug: "reptile_manager"
-description: "Haltungsmanagement für Reptilien — Fütterungen, Häutungen, Zucht, Stammbaum & Home Assistant Integration"
+description: "Reptile husbandry management — feedings, sheds, weight & length, breeding, family tree & Home Assistant integration"
 url: "https://github.com/mariogrip/reptile-manager"
 documentation: "https://github.com/mariogrip/reptile-manager/blob/main/README.md"
 codenotice: "MIT License — demrios-de"
@@ -23,7 +23,7 @@ panel_admin: false
 ports:
   8000/tcp: 8000
 ports_description:
-  8000/tcp: "Backend API (direkt, für api_url Option)"
+  8000/tcp: "Backend API (direct access, for the api_url option)"
 
 map:
   - data:rw
