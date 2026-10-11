@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.6] – 2026-10-11
+
+### Fixed
+- Settings showed a hardcoded "Version 1.1.1"; the frontend and API now read the version from the add-on's `config.yaml`
+
+### Changed
+- Documentation is now English only (README, install guide, contributing guide, issue and PR templates)
+
+---
+
 ## [1.2.5] – 2026-10-11
 
 ### Changed

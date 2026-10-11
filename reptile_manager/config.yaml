@@ -1,5 +1,5 @@
 name: "Reptile Manager"
-version: "1.2.5"
+version: "1.2.6"
 slug: "reptile_manager"
 description: "Reptile husbandry management — feedings, sheds, weight & length, breeding, family tree & Home Assistant integration"
 url: "https://github.com/mariogrip/reptile-manager"
