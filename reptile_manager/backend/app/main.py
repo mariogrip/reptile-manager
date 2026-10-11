@@ -10,7 +10,7 @@ from .database import engine, get_db
 from .database import Base
 from . import models, schemas, auth
 from .config import settings
-from .routers import animals, feedings, sheddings, breeding, custom_fields, ha, export
+from .routers import animals, feedings, sheddings, breeding, custom_fields, ha, export, weights
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -40,6 +40,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.include_router(animals.router,       prefix="/api/animals",       tags=["Animals"])
 app.include_router(feedings.router,      prefix="/api/feedings",      tags=["Feedings"])
 app.include_router(sheddings.router,     prefix="/api/sheddings",     tags=["Sheddings"])
+app.include_router(weights.router,       prefix="/api/weights",       tags=["Weights"])
 app.include_router(breeding.router,      prefix="/api/breeding",      tags=["Breeding"])
 app.include_router(custom_fields.router, prefix="/api/custom-fields", tags=["Custom Fields"])
 app.include_router(ha.router,            prefix="/api/ha",            tags=["Home Assistant"])
@@ -89,6 +90,16 @@ async def startup_event():
             ]:
                 if col not in ha_cols:
                     conn.execute(text(f"ALTER TABLE ha_config ADD COLUMN {col} {typedef}"))
+            conn.commit()
+        except Exception:
+            pass
+        # Seed weight history from the single weight_g value on existing animals
+        try:
+            conn.execute(text(
+                "INSERT INTO weights (animal_id, date, weight_g) "
+                "SELECT id, COALESCE(updated_at, created_at, CURRENT_TIMESTAMP), weight_g FROM animals "
+                "WHERE weight_g IS NOT NULL AND id NOT IN (SELECT DISTINCT animal_id FROM weights)"
+            ))
             conn.commit()
         except Exception:
             pass

@@ -115,6 +115,13 @@ export default {
     torn: 'Gerissen', confirmDelete: 'Häutung löschen?',
     noEntries: 'Keine Häutungen gefunden',
   },
+  weight: {
+    title: 'Gewicht', add: 'Gewicht erfassen', date: 'Datum & Uhrzeit', weight: 'Gewicht (g)',
+    notes: 'Notizen', confirmDelete: 'Gewichtseintrag löschen?', noEntries: 'Noch keine Gewichtseinträge',
+    current: 'Aktuell', change: 'Veränderung', min: 'Niedrigstes', max: 'Höchstes',
+    range_all: 'Alle', range_1y: '1 Jahr', range_6m: '6 Monate', range_3m: '3 Monate',
+    chartEmpty: 'Mindestens zwei Gewichte erfassen, um einen Verlauf zu sehen', since: 'seit',
+  },
   breeding: {
     title: 'Zucht', add: 'Zuchtereignis', female: 'Weibchen ♀', male: 'Männchen ♂',
     paired: 'Zusammengesetzt am', separated: 'Getrennt am',

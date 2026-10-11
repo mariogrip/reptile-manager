@@ -67,6 +67,7 @@ export const animals = {
   delete:      id     => api.delete(`/animals/${id}`),
   feedings:    (id,p) => api.get(`/animals/${id}/feedings`, { params: p }),
   sheddings:   (id,p) => api.get(`/animals/${id}/sheddings`, { params: p }),
+  weights:     (id,p) => api.get(`/animals/${id}/weights`, { params: p }),
   tree:        id     => api.get(`/animals/${id}/tree`),
   uploadPhoto: (id, file) => {
     const form = new FormData(); form.append('file', file)
@@ -77,6 +78,7 @@ export const animals = {
 
 export const feedings   = { list: p => api.get('/feedings', { params: p }), create: d => api.post('/feedings', d), update: (id,d) => api.put(`/feedings/${id}`,d), delete: id => api.delete(`/feedings/${id}`) }
 export const sheddings  = { list: p => api.get('/sheddings',{ params: p }), create: d => api.post('/sheddings',d), update: (id,d) => api.put(`/sheddings/${id}`,d), delete: id => api.delete(`/sheddings/${id}`) }
+export const weights    = { list: p => api.get('/weights',  { params: p }), create: d => api.post('/weights', d),  update: (id,d) => api.put(`/weights/${id}`,d),  delete: id => api.delete(`/weights/${id}`) }
 export const breeding   = { list: p => api.get('/breeding', { params: p }), create: d => api.post('/breeding', d), update: (id,d) => api.put(`/breeding/${id}`,d), delete: id => api.delete(`/breeding/${id}`) }
 export const customFields = { list: aid => api.get(`/custom-fields/animal/${aid}`), create: (aid,d) => api.post(`/custom-fields/animal/${aid}`,d), update: (fid,d) => api.put(`/custom-fields/${fid}`,d), delete: fid => api.delete(`/custom-fields/${fid}`) }
 export const ha = { getConfig: () => api.get('/ha/config'), updateConfig: d => api.put('/ha/config',d), test: () => api.post('/ha/test'), sync: () => api.post('/ha/sync') }

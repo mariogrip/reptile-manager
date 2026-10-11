@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from .. import models, schemas, auth
 from ..database import get_db
+from .weights import log_weight_if_changed
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
@@ -73,6 +74,8 @@ def create_animal(
     d["is_active"] = d.get("status", "active") == "active"
     animal = models.Animal(**d)
     db.add(animal)
+    db.flush()
+    log_weight_if_changed(animal, db)
     db.commit()
     db.refresh(animal)
     return _enrich_animal(animal, db)
@@ -92,6 +95,7 @@ def create_animals_bulk(
         animal = models.Animal(**d)
         db.add(animal)
         db.flush()   # get ID without committing, so _next_tracking_id sees it
+        log_weight_if_changed(animal, db)
         db.refresh(animal)
         created.append(animal)
     db.commit()
@@ -119,6 +123,8 @@ def update_animal(
     # Sync is_active from status
     if data.status is not None:
         animal.is_active = data.status == "active"
+    if "weight_g" in data.model_fields_set:
+        log_weight_if_changed(animal, db)
     db.commit()
     db.refresh(animal)
     return _enrich_animal(animal, db)
@@ -196,6 +202,19 @@ def get_animal_sheddings(
                  .order_by(models.Shedding.date.desc()).offset(skip).limit(limit).all())
     return [schemas.SheddingResponse(**{k: v for k, v in s.__dict__.items() if not k.startswith("_")}, animal_name=animal.name)
             for s in sheddings]
+
+@router.get("/{animal_id}/weights", response_model=List[schemas.WeightResponse])
+def get_animal_weights(
+    animal_id: int, skip: int = 0, limit: int = 1000,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    animal = db.query(models.Animal).filter(models.Animal.id == animal_id).first()
+    if not animal: raise HTTPException(404, "Animal not found")
+    weights = (db.query(models.Weight).filter(models.Weight.animal_id == animal_id)
+               .order_by(models.Weight.date.desc()).offset(skip).limit(limit).all())
+    return [schemas.WeightResponse(**{k: v for k, v in w.__dict__.items() if not k.startswith("_")}, animal_name=animal.name)
+            for w in weights]
 
 @router.get("/{animal_id}/tree")
 def get_family_tree(
