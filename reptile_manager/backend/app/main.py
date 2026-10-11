@@ -223,6 +223,22 @@ async def dashboard(
             animal_name=animal.name if animal else None,
         )
 
+    # Weight history (last year) for each active animal that has any entries
+    year_ago = now - timedelta(days=365)
+    weight_trends = []
+    for a in active_animals_list:
+        ws = (
+            db.query(models.Weight)
+            .filter(models.Weight.animal_id == a.id, models.Weight.date >= year_ago)
+            .order_by(models.Weight.date.asc())
+            .all()
+        )
+        if ws:
+            weight_trends.append(schemas.AnimalWeightTrend(
+                id=a.id, name=a.name, species=a.species, photo_url=a.photo_url,
+                points=[schemas.WeightPoint(date=w.date, weight_g=w.weight_g) for w in ws],
+            ))
+
     return schemas.DashboardStats(
         total_animals=total_animals,
         active_animals=active_animals,
@@ -234,6 +250,7 @@ async def dashboard(
         recent_feedings=[enrich_feeding(f) for f in raw_feedings],
         recent_sheddings=[enrich_shedding(s) for s in raw_sheddings],
         animals_needing_feeding=animals_needing,
+        weight_trends=weight_trends,
     )
 
 @app.get("/health", tags=["Health"])

@@ -1,16 +1,39 @@
 <script setup>
 import { useI18n } from '@/i18n'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { dashboard } from '@/api'
 import { useRouter } from 'vue-router'
 import { mediaUrl } from '@/utils/media'
+import Sparkline from '@/components/Sparkline.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const router = useRouter()
 const stats = ref(null)
 const loading = ref(true)
 const showFeedingModal = ref(false)
+const showAllTrends = ref(false)
+
+const TREND_LIMIT = 8
+const LOSS_WARN_PCT = -5   // flag animals that lost more than this over 90 days
+
+// One small chart per animal (each on its own scale), losses first
+const weightTrends = computed(() => {
+  const cutoff = Date.now() - 90 * 86400000
+  return (stats.value?.weight_trends ?? [])
+    .map(a => {
+      const points = a.points.map(p => ({ t: new Date(p.date).getTime(), v: p.weight_g }))
+      const current = points[points.length - 1]
+      // Baseline: last entry at least 90 days old, otherwise the oldest one in range
+      const base = [...points].reverse().find(p => p.t <= cutoff) ?? points[0]
+      const diff = current.v - base.v
+      const pct = base !== current && base.v ? (diff / base.v) * 100 : null
+      return { ...a, points, current, diff, pct }
+    })
+    .sort((a, b) => (a.pct ?? Infinity) - (b.pct ?? Infinity) || a.name.localeCompare(b.name))
+})
+const visibleTrends = computed(() => showAllTrends.value ? weightTrends.value : weightTrends.value.slice(0, TREND_LIMIT))
+const dateLocale = computed(() => locale.value === 'de' ? 'de-DE' : 'en-GB')
 
 onMounted(async () => {
   try {
@@ -92,6 +115,37 @@ function sexClass(sex) {
             {{ stats.animals_not_fed_7days > 0 ? t('dashboard.not_fed') + ' — ' + t('dashboard.click_for_details') : t('dashboard.all_fed') }}
           </span>
         </div>
+      </div>
+
+      <!-- Weight trends -->
+      <div v-if="weightTrends.length" class="card mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-semibold text-slate-200 text-sm md:text-base">{{ t('dashboard.weight_trends') }}</h2>
+          <span class="text-xs text-slate-500">{{ t('dashboard.weight_trends_hint') }}</span>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div v-for="a in visibleTrends" :key="a.id"
+               class="bg-surface-800 rounded-xl p-3 cursor-pointer border border-transparent hover:border-brand-500 transition-colors"
+               @click="router.push(`/animals/${a.id}?tab=weights`)">
+            <div class="flex items-baseline justify-between gap-2 mb-1">
+              <span class="text-sm font-medium text-slate-200 truncate">{{ a.name }}</span>
+              <span class="text-sm font-semibold text-slate-200 whitespace-nowrap">{{ +a.current.v.toFixed(1) }} g</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 mb-2 text-xs">
+              <span v-if="a.pct !== null" class="text-slate-400 whitespace-nowrap">
+                {{ a.diff > 0 ? '▲ +' : a.diff < 0 ? '▼ ' : '■ ' }}{{ +a.diff.toFixed(1) }} g
+                ({{ a.pct > 0 ? '+' : '' }}{{ a.pct.toFixed(1) }}%)
+              </span>
+              <span v-else class="text-slate-600">{{ t('dashboard.weight_single') }}</span>
+              <span v-if="a.pct !== null && a.pct <= LOSS_WARN_PCT" class="badge-yellow whitespace-nowrap">⚠ {{ t('dashboard.weight_loss') }}</span>
+            </div>
+            <Sparkline :points="a.points" unit="g" :locale="dateLocale" />
+          </div>
+        </div>
+        <button v-if="weightTrends.length > TREND_LIMIT" class="text-xs text-brand-400 hover:text-brand-500 mt-3"
+                @click="showAllTrends = !showAllTrends">
+          {{ showAllTrends ? t('dashboard.show_less') : `${t('dashboard.show_all')} (${weightTrends.length})` }}
+        </button>
       </div>
 
       <!-- Recent activity -->

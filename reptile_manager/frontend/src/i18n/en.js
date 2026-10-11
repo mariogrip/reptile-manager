@@ -191,6 +191,9 @@ export default {
     recent_feedings: 'Recent feedings', recent_sheddings: 'Recent sheds',
     feeding_modal_title: 'Feeding overdue', days_no_food: 'without food',
     threshold: 'Threshold', to_feedings: 'Go to feedings →',
+    weight_trends: 'Weight trends', weight_trends_hint: 'Last 12 months · change over 90 days',
+    weight_loss: 'Losing weight', weight_single: 'Only one entry',
+    show_all: 'Show all', show_less: 'Show less',
   },
   login: {
     subtitle: 'Self-hosted husbandry management',

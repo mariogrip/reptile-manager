@@ -191,6 +191,9 @@ export default {
     recent_feedings: 'Letzte Fütterungen', recent_sheddings: 'Letzte Häutungen',
     feeding_modal_title: 'Fütterung überfällig', days_no_food: 'ohne Futter',
     threshold: 'Schwelle', to_feedings: 'Zur Fütterungsübersicht →',
+    weight_trends: 'Gewichtsverlauf', weight_trends_hint: 'Letzte 12 Monate · Veränderung über 90 Tage',
+    weight_loss: 'Nimmt ab', weight_single: 'Nur ein Eintrag',
+    show_all: 'Alle anzeigen', show_less: 'Weniger anzeigen',
   },
   login: {
     subtitle: 'Selbst gehostetes Haltungsmanagement',

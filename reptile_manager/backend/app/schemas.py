@@ -336,6 +336,17 @@ class AnimalNeedingFeeding(BaseModel):
     days_since_feeding: Optional[int] = None
     threshold_days: int
 
+class WeightPoint(BaseModel):
+    date: datetime
+    weight_g: float
+
+class AnimalWeightTrend(BaseModel):
+    id: int
+    name: str
+    species: str
+    photo_url: Optional[str] = None
+    points: List[WeightPoint]   # oldest first
+
 class DashboardStats(BaseModel):
     total_animals: int
     active_animals: int
@@ -347,3 +358,4 @@ class DashboardStats(BaseModel):
     recent_feedings: List[FeedingResponse]
     recent_sheddings: List[SheddingResponse]
     animals_needing_feeding: List[AnimalNeedingFeeding] = []
+    weight_trends: List[AnimalWeightTrend] = []

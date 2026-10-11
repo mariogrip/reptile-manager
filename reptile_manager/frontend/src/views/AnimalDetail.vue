@@ -16,7 +16,7 @@ const sheddingList = ref([])
 const weightList = ref([])
 const lengthList = ref([])
 const customFieldList = ref([])
-const tab = ref('feedings')
+const tab = ref(route.query.tab || 'feedings')
 const loading = ref(true)
 
 // New feeding form
