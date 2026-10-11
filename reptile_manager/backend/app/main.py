@@ -10,7 +10,7 @@ from .database import engine, get_db
 from .database import Base
 from . import models, schemas, auth
 from .config import settings
-from .routers import animals, feedings, sheddings, breeding, custom_fields, ha, export, weights
+from .routers import animals, feedings, sheddings, breeding, custom_fields, ha, export, weights, lengths
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -41,6 +41,7 @@ app.include_router(animals.router,       prefix="/api/animals",       tags=["Ani
 app.include_router(feedings.router,      prefix="/api/feedings",      tags=["Feedings"])
 app.include_router(sheddings.router,     prefix="/api/sheddings",     tags=["Sheddings"])
 app.include_router(weights.router,       prefix="/api/weights",       tags=["Weights"])
+app.include_router(lengths.router,       prefix="/api/lengths",       tags=["Lengths"])
 app.include_router(breeding.router,      prefix="/api/breeding",      tags=["Breeding"])
 app.include_router(custom_fields.router, prefix="/api/custom-fields", tags=["Custom Fields"])
 app.include_router(ha.router,            prefix="/api/ha",            tags=["Home Assistant"])
@@ -93,16 +94,17 @@ async def startup_event():
             conn.commit()
         except Exception:
             pass
-        # Seed weight history from the single weight_g value on existing animals
-        try:
-            conn.execute(text(
-                "INSERT INTO weights (animal_id, date, weight_g) "
-                "SELECT id, COALESCE(updated_at, created_at, CURRENT_TIMESTAMP), weight_g FROM animals "
-                "WHERE weight_g IS NOT NULL AND id NOT IN (SELECT DISTINCT animal_id FROM weights)"
-            ))
-            conn.commit()
-        except Exception:
-            pass
+        # Seed measurement history from the single current value on existing animals
+        for table, col in [("weights", "weight_g"), ("lengths", "length_cm")]:
+            try:
+                conn.execute(text(
+                    f"INSERT INTO {table} (animal_id, date, {col}) "
+                    f"SELECT id, COALESCE(updated_at, created_at, CURRENT_TIMESTAMP), {col} FROM animals "
+                    f"WHERE {col} IS NOT NULL AND id NOT IN (SELECT DISTINCT animal_id FROM {table})"
+                ))
+                conn.commit()
+            except Exception:
+                pass
     db = next(get_db())
     try:
         if db.query(models.User).count() == 0:

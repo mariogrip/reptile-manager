@@ -75,6 +75,7 @@ class Animal(Base):
     feedings = relationship("Feeding", back_populates="animal", cascade="all, delete-orphan")
     sheddings = relationship("Shedding", back_populates="animal", cascade="all, delete-orphan")
     weights = relationship("Weight", back_populates="animal", cascade="all, delete-orphan")
+    lengths = relationship("Length", back_populates="animal", cascade="all, delete-orphan")
     custom_fields = relationship("CustomField", back_populates="animal", cascade="all, delete-orphan")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -121,6 +122,18 @@ class Weight(Base):
     notes = Column(Text)
 
     animal = relationship("Animal", back_populates="weights")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class Length(Base):
+    __tablename__ = "lengths"
+
+    id = Column(Integer, primary_key=True, index=True)
+    animal_id = Column(Integer, ForeignKey("animals.id", ondelete="CASCADE"), nullable=False, index=True)
+    date = Column(DateTime(timezone=True), nullable=False, index=True)
+    length_cm = Column(Float, nullable=False)
+    notes = Column(Text)
+
+    animal = relationship("Animal", back_populates="lengths")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class BreedingEvent(Base):

@@ -116,11 +116,18 @@ export default {
     noEntries: 'No sheddings found',
   },
   weight: {
-    title: 'Weight', add: 'Log weight', date: 'Date & time', weight: 'Weight (g)',
+    title: 'Weight', add: 'Log weight', date: 'Date & time', value: 'Weight (g)',
     notes: 'Notes', confirmDelete: 'Delete weight entry?', noEntries: 'No weight entries yet',
     current: 'Current', change: 'Change', min: 'Lowest', max: 'Highest',
     range_all: 'All', range_1y: '1 year', range_6m: '6 months', range_3m: '3 months',
     chartEmpty: 'Log at least two weights to see a trend', since: 'since',
+  },
+  length: {
+    title: 'Length', add: 'Log length', date: 'Date & time', value: 'Length (cm)',
+    notes: 'Notes', confirmDelete: 'Delete length entry?', noEntries: 'No length entries yet',
+    current: 'Current', change: 'Change', min: 'Shortest', max: 'Longest',
+    range_all: 'All', range_1y: '1 year', range_6m: '6 months', range_3m: '3 months',
+    chartEmpty: 'Log at least two lengths to see a trend', since: 'since',
   },
   breeding: {
     title: 'Breeding', add: 'Breeding event', female: 'Female ♀', male: 'Male ♂',

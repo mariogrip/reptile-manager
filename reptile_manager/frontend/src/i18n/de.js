@@ -116,11 +116,18 @@ export default {
     noEntries: 'Keine Häutungen gefunden',
   },
   weight: {
-    title: 'Gewicht', add: 'Gewicht erfassen', date: 'Datum & Uhrzeit', weight: 'Gewicht (g)',
+    title: 'Gewicht', add: 'Gewicht erfassen', date: 'Datum & Uhrzeit', value: 'Gewicht (g)',
     notes: 'Notizen', confirmDelete: 'Gewichtseintrag löschen?', noEntries: 'Noch keine Gewichtseinträge',
     current: 'Aktuell', change: 'Veränderung', min: 'Niedrigstes', max: 'Höchstes',
     range_all: 'Alle', range_1y: '1 Jahr', range_6m: '6 Monate', range_3m: '3 Monate',
     chartEmpty: 'Mindestens zwei Gewichte erfassen, um einen Verlauf zu sehen', since: 'seit',
+  },
+  length: {
+    title: 'Länge', add: 'Länge erfassen', date: 'Datum & Uhrzeit', value: 'Länge (cm)',
+    notes: 'Notizen', confirmDelete: 'Längeneintrag löschen?', noEntries: 'Noch keine Längeneinträge',
+    current: 'Aktuell', change: 'Veränderung', min: 'Kürzeste', max: 'Längste',
+    range_all: 'Alle', range_1y: '1 Jahr', range_6m: '6 Monate', range_3m: '3 Monate',
+    chartEmpty: 'Mindestens zwei Längen erfassen, um einen Verlauf zu sehen', since: 'seit',
   },
   breeding: {
     title: 'Zucht', add: 'Zuchtereignis', female: 'Weibchen ♀', male: 'Männchen ♂',

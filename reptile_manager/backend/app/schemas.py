@@ -214,6 +214,29 @@ class WeightResponse(WeightBase):
 
     model_config = {"from_attributes": True}
 
+# ── Lengths ───────────────────────────────────────────────────────────────────
+
+class LengthBase(BaseModel):
+    date: datetime
+    length_cm: float
+    notes: Optional[str] = None
+
+class LengthCreate(LengthBase):
+    animal_id: int
+
+class LengthUpdate(BaseModel):
+    date: Optional[datetime] = None
+    length_cm: Optional[float] = None
+    notes: Optional[str] = None
+
+class LengthResponse(LengthBase):
+    id: int
+    animal_id: int
+    animal_name: Optional[str] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
 # ── Breeding ──────────────────────────────────────────────────────────────────
 
 class BreedingEventBase(BaseModel):

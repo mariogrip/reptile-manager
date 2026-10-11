@@ -3,10 +3,10 @@ import { useI18n } from '@/i18n'
 import { ref, onMounted } from 'vue'
 import { mediaUrl } from '@/utils/media'
 import { useRoute, useRouter } from 'vue-router'
-import WeightChart from '@/components/WeightChart.vue'
+import MeasurementTab from '@/components/MeasurementTab.vue'
 
 const { t } = useI18n()
-import { animals as animalsApi, feedings as feedingsApi, sheddings as sheddingsApi, weights as weightsApi, customFields } from '@/api'
+import { animals as animalsApi, feedings as feedingsApi, sheddings as sheddingsApi, weights as weightsApi, lengths as lengthsApi, customFields } from '@/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +14,7 @@ const animal = ref(null)
 const feedingList = ref([])
 const sheddingList = ref([])
 const weightList = ref([])
+const lengthList = ref([])
 const customFieldList = ref([])
 const tab = ref('feedings')
 const loading = ref(true)
@@ -28,11 +29,6 @@ const sheddingForm = ref({ date: new Date().toISOString().slice(0,16), complete:
 const showSheddingForm = ref(false)
 const savingShedding = ref(false)
 
-// New weight form
-const weightForm = ref({ date: new Date().toISOString().slice(0,16), weight_g: '', notes: '' })
-const showWeightForm = ref(false)
-const savingWeight = ref(false)
-
 // Custom field form
 const cfForm = ref({ field_name: '', field_value: '', field_type: 'text' })
 const showCfForm = ref(false)
@@ -40,17 +36,19 @@ const savingCf = ref(false)
 
 onMounted(async () => {
   const id = route.params.id
-  const [aRes, fRes, sRes, wRes, cfRes] = await Promise.all([
+  const [aRes, fRes, sRes, wRes, lRes, cfRes] = await Promise.all([
     animalsApi.get(id),
     animalsApi.feedings(id),
     animalsApi.sheddings(id),
     animalsApi.weights(id),
+    animalsApi.lengths(id),
     customFields.list(id),
   ])
   animal.value = aRes.data
   feedingList.value = fRes.data
   sheddingList.value = sRes.data
   weightList.value = wRes.data
+  lengthList.value = lRes.data
   customFieldList.value = cfRes.data
   loading.value = false
 })
@@ -92,31 +90,14 @@ async function addShedding() {
   }
 }
 
-async function addWeight() {
-  savingWeight.value = true
-  try {
-    const payload = { ...weightForm.value, animal_id: parseInt(route.params.id), weight_g: parseFloat(weightForm.value.weight_g) }
-    const res = await weightsApi.create(payload)
-    weightList.value = [res.data, ...weightList.value].sort((a, b) => new Date(b.date) - new Date(a.date))
-    animal.value.weight_g = weightList.value[0].weight_g
-    showWeightForm.value = false
-    weightForm.value = { date: new Date().toISOString().slice(0,16), weight_g: '', notes: '' }
-  } finally {
-    savingWeight.value = false
-  }
+// Measurement lists are newest first; the animal's current value follows the latest entry
+function setWeights(list) {
+  weightList.value = list
+  if (list.length) animal.value.weight_g = list[0].weight_g
 }
-
-async function deleteWeight(id) {
-  if (!confirm(t('weight.confirmDelete'))) return
-  await weightsApi.delete(id)
-  weightList.value = weightList.value.filter(w => w.id !== id)
-  if (weightList.value.length) animal.value.weight_g = weightList.value[0].weight_g
-}
-
-// Change vs. the previous (older) entry; list is sorted newest first
-function weightDelta(i) {
-  const next = weightList.value[i + 1]
-  return next ? weightList.value[i].weight_g - next.weight_g : null
+function setLengths(list) {
+  lengthList.value = list
+  if (list.length) animal.value.length_cm = list[0].length_cm
 }
 
 async function deleteFeeding(id) {
@@ -186,7 +167,7 @@ function sexNotation(sex) {
         <div class="text-xl font-bold text-slate-200">{{ animal.weight_g ? `${animal.weight_g} g` : '—' }}</div>
         <div class="text-xs text-slate-500">{{ t('animal.weight').replace(' (g)','') }}</div>
       </div>
-      <div class="card text-center py-3">
+      <div class="card text-center py-3 cursor-pointer hover:bg-surface-600 transition-colors" @click="tab = 'lengths'">
         <div class="text-xl font-bold text-slate-200">{{ animal.length_cm ? `${animal.length_cm} cm` : '—' }}</div>
         <div class="text-xs text-slate-500">{{ t('animal.length').replace(' (cm)','') }}</div>
       </div>
@@ -265,7 +246,7 @@ function sexNotation(sex) {
 
     <!-- Tabs -->
     <div class="flex gap-1 mb-4 border-b border-surface-600">
-      <button v-for="tabItem in [{id:'feedings',label:t('feeding.title'),count:feedingList.length},{id:'sheddings',label:t('shedding.title'),count:sheddingList.length},{id:'weights',label:t('weight.title'),count:weightList.length},{id:'custom',label:t('animal.custom_fields'),count:customFieldList.length}]"
+      <button v-for="tabItem in [{id:'feedings',label:t('feeding.title'),count:feedingList.length},{id:'sheddings',label:t('shedding.title'),count:sheddingList.length},{id:'weights',label:t('weight.title'),count:weightList.length},{id:'lengths',label:t('length.title'),count:lengthList.length},{id:'custom',label:t('animal.custom_fields'),count:customFieldList.length}]"
         :key="tabItem.id"
         @click="tab = tabItem.id"
         :class="tab === tabItem.id ? 'text-brand-400 border-b-2 border-brand-400' : 'text-slate-500 hover:text-slate-300'"
@@ -409,62 +390,12 @@ function sexNotation(sex) {
     </div>
 
     <!-- Weights tab -->
-    <div v-if="tab === 'weights'">
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm text-slate-500">{{ weightList.length }} {{ t('common.entries') }}</span>
-        <button class="btn-primary btn-sm" @click="showWeightForm = !showWeightForm">+ {{ t('weight.add') }}</button>
-      </div>
+    <MeasurementTab v-if="tab === 'weights'" :animal-id="animal.id" :entries="weightList" @update:entries="setWeights"
+                    :api="weightsApi" field="weight_g" unit="g" ns="weight" />
 
-      <!-- Weight form -->
-      <div v-if="showWeightForm" class="card mb-4">
-        <h3 class="font-medium text-slate-200 mb-3">{{ t('weight.add') }}</h3>
-        <form @submit.prevent="addWeight" class="grid sm:grid-cols-2 gap-3">
-          <div><label>{{ t('weight.date') }}</label><input type="datetime-local" v-model="weightForm.date" required /></div>
-          <div><label>{{ t('weight.weight') }}</label><input type="number" v-model="weightForm.weight_g" step="0.1" min="0.1" required autofocus /></div>
-          <div class="sm:col-span-2"><label>{{ t('weight.notes') }}</label><textarea v-model="weightForm.notes" rows="2" /></div>
-          <div class="sm:col-span-2 flex gap-2">
-            <button type="submit" class="btn-primary btn-sm" :disabled="savingWeight">
-              {{ savingWeight ? t('common.saving') : t('common.save') }}
-            </button>
-            <button type="button" class="btn-secondary btn-sm" @click="showWeightForm = false">{{ t('common.cancel') }}</button>
-          </div>
-        </form>
-      </div>
-
-      <WeightChart v-if="weightList.length" :entries="weightList" />
-
-      <!-- Weight list -->
-      <div class="card">
-        <div v-if="!weightList.length" class="text-slate-500 text-center py-8">{{ t('weight.noEntries') }}</div>
-        <table v-else class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-slate-500 border-b border-surface-600">
-              <th class="pb-2 pr-4">{{ t('weight.date') }}</th>
-              <th class="pb-2 pr-4">{{ t('weight.weight') }}</th>
-              <th class="pb-2 pr-4">{{ t('weight.change') }}</th>
-              <th class="pb-2 pr-4">{{ t('weight.notes') }}</th>
-              <th class="pb-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(w, i) in weightList" :key="w.id" class="table-row">
-              <td class="py-2 pr-4 whitespace-nowrap text-slate-400">{{ fmtDateTime(w.date) }}</td>
-              <td class="py-2 pr-4 text-slate-200">{{ w.weight_g }} g</td>
-              <td class="py-2 pr-4 text-slate-400 whitespace-nowrap">
-                <template v-if="weightDelta(i) !== null">
-                  {{ weightDelta(i) > 0 ? '▲ +' : weightDelta(i) < 0 ? '▼ ' : '■ ' }}{{ +weightDelta(i).toFixed(1) }} g
-                </template>
-                <template v-else>—</template>
-              </td>
-              <td class="py-2 pr-4 text-slate-500 max-w-[150px] truncate">{{ w.notes }}</td>
-              <td class="py-2">
-                <button @click="deleteWeight(w.id)" class="text-slate-600 hover:text-red-400 transition-colors">🗑</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <!-- Lengths tab -->
+    <MeasurementTab v-if="tab === 'lengths'" :animal-id="animal.id" :entries="lengthList" @update:entries="setLengths"
+                    :api="lengthsApi" field="length_cm" unit="cm" ns="length" />
 
     <!-- Custom fields tab -->
     <div v-if="tab === 'custom'">

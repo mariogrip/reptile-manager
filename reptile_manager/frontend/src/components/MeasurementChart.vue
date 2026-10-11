@@ -3,8 +3,11 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/i18n'
 
 const props = defineProps({
-  // [{ date, weight_g }] in any order
+  // [{ date, [field] }] in any order
   entries: { type: Array, default: () => [] },
+  field: { type: String, required: true },  // 'weight_g' | 'length_cm'
+  unit: { type: String, required: true },   // 'g' | 'cm'
+  ns: { type: String, required: true },     // i18n namespace: 'weight' | 'length'
 })
 
 const { t, locale } = useI18n()
@@ -35,7 +38,7 @@ onBeforeUnmount(() => ro?.disconnect())
 
 const sorted = computed(() =>
   props.entries
-    .map(e => ({ ...e, t: new Date(e.date).getTime() }))
+    .map(e => ({ ...e, t: new Date(e.date).getTime(), v: e[props.field] }))
     .sort((a, b) => a.t - b.t)
 )
 
@@ -51,10 +54,10 @@ const stats = computed(() => {
   const p = points.value
   if (!p.length) return null
   const first = p[0], last = p[p.length - 1]
-  const diff = last.weight_g - first.weight_g
-  const pct = first.weight_g ? (diff / first.weight_g) * 100 : 0
-  const ws = p.map(x => x.weight_g)
-  return { current: last.weight_g, diff, pct, first, min: Math.min(...ws), max: Math.max(...ws) }
+  const diff = last.v - first.v
+  const pct = first.v ? (diff / first.v) * 100 : 0
+  const ws = p.map(x => x.v)
+  return { current: last.v, diff, pct, first, min: Math.min(...ws), max: Math.max(...ws) }
 })
 
 // "Nice" tick step for the y-axis
@@ -71,8 +74,8 @@ const scales = computed(() => {
   const innerH = HEIGHT - PAD.top - PAD.bottom
   if (p.length < 2) return null
 
-  let lo = Math.min(...p.map(x => x.weight_g))
-  let hi = Math.max(...p.map(x => x.weight_g))
+  let lo = Math.min(...p.map(x => x.v))
+  let hi = Math.max(...p.map(x => x.v))
   if (lo === hi) { lo -= 1; hi += 1 }
   const pad = (hi - lo) * 0.1
   const step = niceStep(hi - lo + 2 * pad, 4)
@@ -94,7 +97,7 @@ const scales = computed(() => {
 const path = computed(() => {
   const s = scales.value
   if (!s) return ''
-  return points.value.map((p, i) => `${i ? 'L' : 'M'}${s.x(p.t).toFixed(1)},${s.y(p.weight_g).toFixed(1)}`).join('')
+  return points.value.map((p, i) => `${i ? 'L' : 'M'}${s.x(p.t).toFixed(1)},${s.y(p.v).toFixed(1)}`).join('')
 })
 
 const spanDays = computed(() => scales.value ? (scales.value.tMax - scales.value.tMin) / 86400000 : 0)
@@ -104,7 +107,7 @@ function fmtTick(ts) {
   return new Date(ts).toLocaleDateString(loc.value, opts)
 }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString(loc.value, { day: '2-digit', month: 'short', year: 'numeric' }) }
-function fmtG(v) { return `${+v.toFixed(1)} g` }
+function fmtVal(v) { return `${+v.toFixed(1)} ${props.unit}` }
 
 // ── Hover: nearest point by x ────────────────────────────────────────────────
 const hover = ref(null)
@@ -127,11 +130,11 @@ const tip = computed(() => {
   const prev = idx > 0 ? points.value[idx - 1] : null
   const px = s.x(h.t)
   return {
-    x: px, y: s.y(h.weight_g),
+    x: px, y: s.y(h.v),
     left: px > width.value / 2,
     date: fmtDate(h.t),
-    value: fmtG(h.weight_g),
-    delta: prev ? h.weight_g - prev.weight_g : null,
+    value: fmtVal(h.v),
+    delta: prev ? h.v - prev.v : null,
   }
 })
 </script>
@@ -142,20 +145,20 @@ const tip = computed(() => {
     <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
       <div v-if="stats" class="flex flex-wrap gap-x-6 gap-y-1">
         <div>
-          <div class="text-xs text-slate-500">{{ t('weight.current') }}</div>
-          <div class="text-2xl font-bold text-slate-200">{{ fmtG(stats.current) }}</div>
+          <div class="text-xs text-slate-500">{{ t(ns + '.current') }}</div>
+          <div class="text-2xl font-bold text-slate-200">{{ fmtVal(stats.current) }}</div>
         </div>
         <div v-if="points.length > 1">
-          <div class="text-xs text-slate-500">{{ t('weight.change') }} <span class="opacity-70">({{ t('weight.since') }} {{ fmtDate(stats.first.t) }})</span></div>
+          <div class="text-xs text-slate-500">{{ t(ns + '.change') }} <span class="opacity-70">({{ t(ns + '.since') }} {{ fmtDate(stats.first.t) }})</span></div>
           <div class="text-lg font-semibold text-slate-200 mt-1">
             <span aria-hidden="true">{{ stats.diff > 0 ? '▲' : stats.diff < 0 ? '▼' : '■' }}</span>
-            {{ stats.diff > 0 ? '+' : '' }}{{ fmtG(stats.diff) }}
+            {{ stats.diff > 0 ? '+' : '' }}{{ fmtVal(stats.diff) }}
             <span class="text-sm text-slate-400">({{ stats.pct > 0 ? '+' : '' }}{{ stats.pct.toFixed(1) }}%)</span>
           </div>
         </div>
         <div v-if="points.length > 1">
-          <div class="text-xs text-slate-500">{{ t('weight.min') }} / {{ t('weight.max') }}</div>
-          <div class="text-lg font-semibold text-slate-200 mt-1">{{ fmtG(stats.min) }} / {{ fmtG(stats.max) }}</div>
+          <div class="text-xs text-slate-500">{{ t(ns + '.min') }} / {{ t(ns + '.max') }}</div>
+          <div class="text-lg font-semibold text-slate-200 mt-1">{{ fmtVal(stats.min) }} / {{ fmtVal(stats.max) }}</div>
         </div>
       </div>
       <div class="flex gap-1 bg-surface-800 rounded-lg p-1 ml-auto" role="group">
@@ -163,7 +166,7 @@ const tip = computed(() => {
           :aria-pressed="range === r.id"
           :class="range === r.id ? 'bg-surface-500 text-slate-200' : 'text-slate-500 hover:text-slate-300'"
           class="px-2.5 py-1 text-xs rounded-md transition-colors">
-          {{ t('weight.range_' + r.id) }}
+          {{ t(ns + '.range_' + r.id) }}
         </button>
       </div>
     </div>
@@ -171,10 +174,10 @@ const tip = computed(() => {
     <!-- Chart -->
     <div ref="wrap" class="relative w-full">
       <div v-if="!scales" class="flex items-center justify-center text-sm text-slate-500" :style="{ height: HEIGHT + 'px' }">
-        {{ t('weight.chartEmpty') }}
+        {{ t(ns + '.chartEmpty') }}
       </div>
       <svg v-else :width="width" :height="HEIGHT" :viewBox="`0 0 ${width} ${HEIGHT}`" class="block select-none"
-           role="img" :aria-label="t('weight.title')"
+           role="img" :aria-label="t(ns + '.title')"
            @mousemove="onMove" @mouseleave="hover = null"
            @touchstart.passive="e => onMove(e.touches[0] ? { clientX: e.touches[0].clientX, currentTarget: e.currentTarget } : e)"
            @touchmove.passive="e => onMove({ clientX: e.touches[0].clientX, currentTarget: e.currentTarget })">
@@ -183,7 +186,7 @@ const tip = computed(() => {
           <line :x1="PAD.left" :x2="width - PAD.right" :y1="scales.y(v)" :y2="scales.y(v)" :stroke="GRID" stroke-width="1" />
           <text :x="PAD.left - 8" :y="scales.y(v)" text-anchor="end" dominant-baseline="middle" :fill="AXIS_TEXT" font-size="11">{{ +v.toFixed(1) }}</text>
         </g>
-        <text :x="PAD.left - 8" :y="PAD.top - 16" text-anchor="end" :fill="AXIS_TEXT" font-size="10">g</text>
+        <text :x="PAD.left - 8" :y="PAD.top - 16" text-anchor="end" :fill="AXIS_TEXT" font-size="10">{{ unit }}</text>
         <!-- X labels -->
         <text v-for="(ts, i) in scales.xTicks" :key="'x' + i"
               :x="scales.x(ts)" :y="HEIGHT - 8" :fill="AXIS_TEXT" font-size="11"
@@ -194,7 +197,7 @@ const tip = computed(() => {
 
         <!-- Markers (only when sparse enough to read) -->
         <template v-if="points.length <= 60">
-          <circle v-for="p in points" :key="p.id ?? p.t" :cx="scales.x(p.t)" :cy="scales.y(p.weight_g)" r="4"
+          <circle v-for="p in points" :key="p.id ?? p.t" :cx="scales.x(p.t)" :cy="scales.y(p.v)" r="4"
                   :fill="LINE" :stroke="SURFACE" stroke-width="2" />
         </template>
 
@@ -215,7 +218,7 @@ const tip = computed(() => {
         <div class="text-slate-400">{{ tip.date }}</div>
         <div class="text-slate-200 font-semibold text-sm">{{ tip.value }}</div>
         <div v-if="tip.delta !== null" class="text-slate-400">
-          {{ tip.delta > 0 ? '▲ +' : tip.delta < 0 ? '▼ ' : '■ ' }}{{ fmtG(tip.delta) }}
+          {{ tip.delta > 0 ? '▲ +' : tip.delta < 0 ? '▼ ' : '■ ' }}{{ fmtVal(tip.delta) }}
         </div>
       </div>
     </div>
