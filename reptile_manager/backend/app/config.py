@@ -1,4 +1,21 @@
+import re
+from pathlib import Path
 from pydantic_settings import BaseSettings
+
+def _addon_version() -> str:
+    """Read the version from the add-on's config.yaml (single source of truth)."""
+    here = Path(__file__).resolve()
+    # Docker image: /app/config.yaml; repo checkout: reptile_manager/config.yaml
+    for path in (here.parents[1] / "config.yaml", here.parents[2] / "config.yaml"):
+        try:
+            m = re.search(r'^version:\s*["\']?([^"\'\s]+)', path.read_text(), re.M)
+            if m:
+                return m.group(1)
+        except OSError:
+            continue
+    return "dev"
+
+APP_VERSION = _addon_version()
 
 class Settings(BaseSettings):
     database_url: str = "postgresql://reptile:reptilepass@db:5432/reptiledb"

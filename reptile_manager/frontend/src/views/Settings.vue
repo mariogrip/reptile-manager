@@ -4,6 +4,7 @@ import { ha } from '@/api'
 import { useI18n } from '@/i18n'
 
 const { t } = useI18n()
+const appVersion = __APP_VERSION__   // injected by vite.config.js from config.yaml
 const config = ref(null)
 const haToken = ref('')
 const saving = ref(false)
@@ -256,7 +257,7 @@ automation:
           <div class="text-5xl">🦎</div>
           <div>
             <div class="text-lg font-bold text-slate-200">Reptile Manager</div>
-            <div class="text-sm text-slate-400">Version 1.1.1</div>
+            <div class="text-sm text-slate-400">Version {{ appVersion }}</div>
             <div class="text-xs text-slate-600 mt-0.5">Self-hosted reptile husbandry management for Home Assistant</div>
           </div>
         </div>

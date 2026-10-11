@@ -6,6 +6,8 @@ COPY frontend/package*.json ./
 RUN npm install --prefer-offline
 
 COPY frontend/ .
+# Vite reads the app version from ../config.yaml (same layout as the repo)
+COPY config.yaml ../config.yaml
 
 # Relative API URL — nginx proxies /api/ internally
 ENV VITE_API_URL=""
@@ -30,6 +32,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Backend source
 COPY backend/app ./app
+# Backend reads the app version from /app/config.yaml
+COPY config.yaml ./config.yaml
 
 # Frontend build output → nginx webroot
 COPY --from=frontend-build /build/dist /var/www/html

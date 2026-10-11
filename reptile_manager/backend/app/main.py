@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from .database import engine, get_db
 from .database import Base
 from . import models, schemas, auth
-from .config import settings
+from .config import settings, APP_VERSION
 from .routers import animals, feedings, sheddings, breeding, custom_fields, ha, export, weights, lengths
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
@@ -21,7 +21,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Reptile Manager",
     description="Self-hosted reptile husbandry tracker with Home Assistant integration",
-    version="1.0.0",
+    version=APP_VERSION,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
