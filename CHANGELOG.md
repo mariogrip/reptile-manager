@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.4] – 2026-10-11
+
+### Added
+- Weight history per animal: new **Weight** tab on the animal page to log weights with date and notes
+- Length history per animal: new **Length** tab, working the same way as weight
+- Charts for weight and length with hover tooltips, time range filter (3 months / 6 months / 1 year / all) and summary (current, change, lowest / highest)
+- Dashboard: weight trends per active animal (last 12 months, change over 90 days); animals losing more than 5% are flagged and listed first, and clicking one opens its weight tab
+- The animal's current weight and length are kept in sync with the latest entry; changing them in the edit form also records an entry
+- Existing animal weights and lengths are imported as the first history entry on upgrade
+
+---
+
 ## [1.2.3] – 2026-09-19
 
 ### Fixed
