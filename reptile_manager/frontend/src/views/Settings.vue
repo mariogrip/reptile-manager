@@ -282,7 +282,7 @@ automation:
           </div>
         </div>
         <div class="flex flex-wrap gap-3">
-          <a href="https://github.com/demrios-de/reptile-manager"
+          <a href="https://github.com/mariogrip/reptile-manager"
              target="_blank" rel="noopener"
              class="btn-secondary btn-sm text-xs flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -290,12 +290,12 @@ automation:
             </svg>
             GitHub
           </a>
-          <a href="https://github.com/demrios-de/reptile-manager/blob/main/CHANGELOG.md"
+          <a href="https://github.com/mariogrip/reptile-manager/blob/main/CHANGELOG.md"
              target="_blank" rel="noopener"
              class="btn-secondary btn-sm text-xs">
             📋 Changelog
           </a>
-          <a href="https://github.com/demrios-de/reptile-manager/issues"
+          <a href="https://github.com/mariogrip/reptile-manager/issues"
              target="_blank" rel="noopener"
              class="btn-secondary btn-sm text-xs">
             {{ t('settings.report_bug') }}

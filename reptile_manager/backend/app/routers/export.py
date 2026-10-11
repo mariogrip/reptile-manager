@@ -322,7 +322,7 @@ def export_herkunftsnachweis(
     els.append(Paragraph(
         f"Herkunftsnachweis zum Nachweis der Legalität nach § 46 BNatSchG &nbsp;|&nbsp; "
         f"Erstellt mit Reptile Manager am {datetime.now().strftime('%d.%m.%Y')} &nbsp;|&nbsp; "
-        f"github.com/demrios-de/reptile-manager",
+        f"github.com/mariogrip/reptile-manager",
         s["legal"]
     ))
 

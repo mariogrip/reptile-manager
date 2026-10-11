@@ -15,7 +15,7 @@ Ich hab das für mich selbst gebaut, weil mir keine bestehende Lösung gefallen 
 
 **Option A — Ein-Klick:**
 
-[![Repository hinzufügen](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdemrios-de%2Freptile-manager)
+[![Repository hinzufügen](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fmariogrip%2Freptile-manager)
 
 **Option B — Manuell:**
 
@@ -23,7 +23,7 @@ Ich hab das für mich selbst gebaut, weil mir keine bestehende Lösung gefallen 
 2. Oben rechts **⋮ → Repositories**
 3. URL eintragen:
    ```
-   https://github.com/demrios-de/reptile-manager
+   https://github.com/mariogrip/reptile-manager
    ```
 4. Seite neu laden → **Reptile Manager** erscheint im Store
 5. Installieren → Konfigurieren → Starten
@@ -117,7 +117,7 @@ I built this because I couldn't find anything that was both properly integrated 
 
 **Option A — One-click:**
 
-[![Add Repository](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdemrios-de%2Freptile-manager)
+[![Add Repository](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fmariogrip%2Freptile-manager)
 
 **Option B — Manual:**
 
@@ -125,7 +125,7 @@ I built this because I couldn't find anything that was both properly integrated 
 2. Top right **⋮ → Repositories**
 3. Enter URL:
    ```
-   https://github.com/demrios-de/reptile-manager
+   https://github.com/mariogrip/reptile-manager
    ```
 4. Reload page → **Reptile Manager** appears in the store
 5. Install → Configure → Start
