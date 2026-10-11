@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.5] – 2026-10-11
+
+### Changed
+- English is now the default language; missing translations fall back to English
+- Dates follow the selected language instead of always using German format
+- Inventory CSV and origin certificate PDF follow the selected language (English by default, German still available)
+- Home Assistant example configuration in Settings is now in English
+- Add-on description and links now point to github.com/mariogrip/reptile-manager
+
+---
+
 ## [1.2.4] – 2026-10-11
 
 ### Added
