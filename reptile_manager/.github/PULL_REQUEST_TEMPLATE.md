@@ -1,10 +1,10 @@
-## Was ändert dieser PR?
+## What does this PR change?
 
 
-## Getestet mit
-- [ ] Backend läuft durch (kein Python-Fehler)
-- [ ] Frontend baut (`npm run build`)
-- [ ] Im Browser manuell getestet
+## Tested with
+- [ ] Backend runs (no Python errors)
+- [ ] Frontend builds (`npm run build`)
+- [ ] Tested manually in the browser
 
-## Sonstiges
+## Other notes
 

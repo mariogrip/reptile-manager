@@ -1,26 +1,26 @@
 ---
-name: Bug melden
-about: Etwas funktioniert nicht wie erwartet
+name: Bug report
+about: Something isn't working as expected
 labels: bug
 ---
 
-**Was ist passiert?**
+**What happened?**
 
 
-**Was hätte passieren sollen?**
+**What should have happened?**
 
 
-**Schritte zum Reproduzieren**
+**Steps to reproduce**
 1. 
 2. 
 3. 
 
-**Umgebung**
-- HA Version:
-- Add-on Version:
+**Environment**
+- HA version:
+- Add-on version:
 - Browser:
 
-**Logs (falls vorhanden)**
+**Logs (if any)**
 ```
-Hier die relevanten Zeilen aus dem Add-on Log einfügen
+Paste the relevant lines from the add-on log here
 ```

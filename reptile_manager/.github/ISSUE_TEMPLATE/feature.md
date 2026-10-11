@@ -1,14 +1,14 @@
 ---
-name: Idee / Feature-Wunsch
-about: Etwas das noch fehlt oder besser sein könnte
+name: Idea / feature request
+about: Something that's missing or could be better
 labels: enhancement
 ---
 
-**Kurze Beschreibung**
+**Short description**
 
 
-**Warum wäre das sinnvoll?**
+**Why would this be useful?**
 
 
-**Hast du dir schon Gedanken gemacht wie es aussehen könnte?**
+**Have you thought about how it could look?**
 

@@ -1,49 +1,51 @@
 # 🦎 Reptile Manager
 
-Ein selbst gehostetes Haltungsmanagement-Tool für Reptilien — als Home Assistant Add-on.
+A self-hosted reptile husbandry management tool — as a Home Assistant Add-on.
 
-Ich hab das für mich selbst gebaut, weil mir keine bestehende Lösung gefallen hat die sowohl in HA integrierbar ist als auch offline läuft. Wer seine Haltung gerne dokumentiert und HA nutzt, wird damit hoffentlich genauso gut klarkommen.
+I built this because I couldn't find anything that was both properly integrated with HA and worked fully offline. If you like keeping detailed records of your animals and use Home Assistant, hopefully this works as well for you as it does for me.
 
-## Was es kann
+## Features
 
-- **Tierverwaltung** — Art, Morph, Geschlecht, Herkunft, Foto, eigene Tiernummer
-- **Fütterungsprotokoll** — Futterart, -größe, Anzahl, live/TK, Akzeptanz; individuelle Warnschwelle pro Tier
-- **Häutungsprotokoll** — Vollständigkeit, Blauphase, Notizen
-- **Zucht** — Paare, Eiablage, Gelegegröße; Nachzucht direkt aus dem Zuchtereignis anlegen (auch 50+ Tiere auf einmal)
-- **Haltungsbedingungen** — Temperatur, Luftfeuchtigkeit, Terrariengröße, Substrat, UV
-- **Stammbaum** — Eltern-Kind-Beziehungen mit visueller Darstellung
-- **Schild-Generator** — Schilder zum Ausdrucken (PNG, 300 dpi), inkl. QR-Code und Foto
-- **Home Assistant Integration** — Webhooks bei Ereignissen, REST-Sensor-Endpunkt, State-Push pro Tier
-- **Mehrsprachig** — Deutsch und Englisch
+- **Animal management** — species, morph, sex, origin, photo, custom tracking ID
+- **Feeding log** — prey type, size, count, live/frozen, acceptance; individual reminder threshold per animal
+- **Shedding log** — completeness, blue phase, notes
+- **Weight & length tracking** — history per animal with charts and time range filter
+- **Dashboard** — weight trends for all animals, with animals losing weight flagged first
+- **Breeding** — pairs, egg laying, clutch size; create offspring straight from a breeding event (50+ animals at once)
+- **Husbandry conditions** — temperature, humidity, enclosure size, substrate, UV
+- **Family tree** — parent-child relationships with visual display
+- **Label generator** — print-ready labels (PNG, 300 dpi) with QR code and photo
+- **Home Assistant integration** — webhooks on events, REST sensor endpoint, per-animal state push
+- **Multilingual** — English (default) and German
 
 ## Installation (Home Assistant Add-on)
 
-### Lokal (entwickeln/testen)
+### Local (development/testing)
 
-1. Ordner `reptile_manager` nach `/addons/` auf dem HA-Host kopieren (SSH oder Samba)
-2. HA → Einstellungen → Add-ons → Add-on Store → ⋮ → Lokale Add-ons neu laden
-3. „Reptile Manager" installieren (Build dauert 2–5 min)
-4. Unter **Konfiguration** einstellen:
-   - `admin_username` / `admin_password` — Login-Daten
-   - `api_url` — falls Netzwerkfehler auftreten: `http://HA-IP:8000/api`
-5. Starten — erscheint in der HA-Sidebar
+1. Copy the `reptile_manager` folder to `/addons/` on the HA host (SSH or Samba)
+2. HA → Settings → Add-ons → Add-on Store → ⋮ → Check for updates / reload local add-ons
+3. Install "Reptile Manager" (the build takes 2–5 min)
+4. Under **Configuration**, set:
+   - `admin_username` / `admin_password` — login credentials
+   - `api_url` — if network errors occur: `http://HA-IP:8000/api`
+5. Start — it appears in the HA sidebar
 
-### Daten
+### Data
 
-Alles liegt persistent in `/data/` des Add-ons (HA verwaltet das automatisch):
+Everything is stored persistently in the add-on's `/data/` folder (managed by HA):
 ```
-/data/reptile.db     — SQLite-Datenbank
-/data/uploads/       — Tierfotos
-/data/.secret_key    — Auto-generierter JWT-Schlüssel
+/data/reptile.db     — SQLite database
+/data/uploads/       — animal photos
+/data/.secret_key    — auto-generated JWT key
 ```
 
-## Home Assistant Sensoren
+## Home Assistant sensors
 
 ```yaml
 # configuration.yaml
 sensor:
   - platform: rest
-    resource: http://DEIN_SERVER:8000/api/ha/sensors
+    resource: http://YOUR_SERVER:8000/api/ha/sensors
     scan_interval: 300
     name: reptile_manager_data
     json_attributes:
@@ -52,27 +54,27 @@ sensor:
 
 template:
   - sensor:
-      - name: "Reptilien aktiv"
+      - name: "Reptiles active"
         state: "{{ state_attr('sensor.reptile_manager_data', 'summary')['active_animals'] | default(0) }}"
-        unit_of_measurement: "Tiere"
+        unit_of_measurement: "animals"
         icon: mdi:snake
 
-      - name: "Reptilien nicht gefüttert"
+      - name: "Reptiles not fed"
         state: "{{ state_attr('sensor.reptile_manager_data', 'summary')['animals_not_fed'] | default(0) }}"
-        unit_of_measurement: "Tiere"
+        unit_of_measurement: "animals"
         icon: mdi:food-off
 ```
 
-## Tech-Stack
+## Tech stack
 
-| Komponente | Technologie |
+| Component | Technology |
 |---|---|
 | Backend | FastAPI (Python 3.12) |
-| Datenbank | SQLite (persistent in `/data/`) |
+| Database | SQLite (persistent in `/data/`) |
 | Frontend | Vue 3 + Tailwind CSS |
 | Hosting | Docker (HA Supervisor) |
 
-## Entwicklung ohne Docker
+## Development without Docker
 
 ```bash
 # Backend
@@ -89,17 +91,17 @@ npm run dev
 ## Backup
 
 ```bash
-# Sicherung
+# Copy the database
 cp /data/addons/data/local_reptile_manager/reptile.db ~/backup-reptile.db
 
-# Oder per SSH
+# Or via SSH
 scp root@homeassistant:/data/addons/data/local_reptile_manager/reptile.db .
 ```
 
-## Mitmachen
+## Contributing
 
-Pull Requests und Issues sind willkommen. Wer Übersetzungen für weitere Sprachen beitragen möchte — die Locale-Dateien liegen in `frontend/src/i18n/`.
+Pull requests and issues are welcome. If you'd like to contribute translations for more languages, the locale files are in `frontend/src/i18n/`.
 
-## Lizenz
+## License
 
 MIT — details in [LICENSE](LICENSE)

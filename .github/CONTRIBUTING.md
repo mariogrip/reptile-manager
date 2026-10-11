@@ -1,8 +1,8 @@
-# Beitragen
+# Contributing
 
-Danke für dein Interesse. PRs und Issues sind willkommen.
+Thanks for your interest. PRs and issues are welcome.
 
-## Entwicklungsumgebung aufsetzen
+## Setting up a development environment
 
 **Backend:**
 ```bash
@@ -18,7 +18,7 @@ SECRET_KEY=dev-key-not-for-production \
 uvicorn app.main:app --reload
 ```
 
-API dann unter http://localhost:8000/api/docs
+The API is then available at http://localhost:8000/api/docs
 
 **Frontend:**
 ```bash
@@ -27,22 +27,22 @@ npm install
 VITE_API_URL=http://localhost:8000/api npm run dev
 ```
 
-## Neue Sprache hinzufügen
+## Adding a new language
 
-Anleitung in `frontend/src/i18n/ADDING_LANGUAGES.md`
+See `frontend/src/i18n/ADDING_LANGUAGES.md`
 
-## Code-Stil
+## Code style
 
-Nichts Besonderes – Python mit Typhinweisen wo es Sinn ergibt, Vue 3 Composition API.
-Commits beschreiben was sich geändert hat, nicht warum (das geht in die PR-Beschreibung).
+Nothing special – Python with type hints where it makes sense, Vue 3 Composition API.
+Commit messages describe what changed, not why (that goes in the PR description).
 
-## Was gerne gesehen wird
+## What's welcome
 
-- Bugfixes mit Reproduktionsschritten im Issue
-- Übersetzungen (fehlende Sprachen oder Korrekturen)
-- Verbesserungen die ich selbst wahrscheinlich irgendwann gebraucht hätte
+- Bug fixes with reproduction steps in the issue
+- Translations (missing languages or corrections)
+- Improvements I'd probably have needed myself at some point
 
-## Was eher nicht passt
+## What's less likely to fit
 
-- Komplette Architekturumbauten ohne vorherige Diskussion
-- Abhängigkeiten die nur für ein kleines Feature gebraucht werden
+- Complete architecture rewrites without prior discussion
+- Dependencies that are only needed for a small feature
